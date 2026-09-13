@@ -38,7 +38,7 @@
       "name": "likec4",
       "source": "./plugins/likec4",
       "description": "C4 architecture models in LikeC4 that stay true to the code: evidence rules, fact-gathering, drift maintenance and review, plus the LikeC4 MCP server for querying the model.",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "keywords": [
         "likec4",
         "c4",
