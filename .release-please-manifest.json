@@ -1,6 +1,6 @@
 {
   "plugins/base-plugin": "0.1.0",
   "plugins/garden": "2.2.0",
-  "plugins/likec4": "0.1.0",
+  "plugins/likec4": "0.2.0",
   "plugins/context": "0.1.0"
 }
