@@ -1,0 +1,122 @@
+{
+  "_comment": "Fixture: a contract-shaped doc-audit envelope for a fictional example project. Use it to exercise a consumer without running the tool. Shape follows references/contract.md sections 1 and 2; regenerate a real one with: node scripts/doc-audit.mjs <root> --json --as-of YYYY-MM-DD",
+  "tool": "doc-audit",
+  "root": "/path/to/example-project",
+  "as_of": "2026-08-17",
+  "summary": {
+    "files_scanned": 8,
+    "files_with_findings": 4,
+    "total": 7,
+    "by_severity": {
+      "critical": 0,
+      "high": 4,
+      "medium": 1,
+      "low": 1,
+      "info": 1
+    },
+    "by_rule": {
+      "stale-doc": 1,
+      "code-churn": 1,
+      "dead-link": 1,
+      "renamed-reference": 1,
+      "version-mismatch": 1,
+      "missing-section": 1,
+      "untracked-doc": 1
+    }
+  },
+  "findings": [
+    {
+      "path": "README.md",
+      "line": 12,
+      "column": 18,
+      "severity": "medium",
+      "category": "temporal",
+      "rule": "version-mismatch",
+      "message": "documents version 1.8.0, but the latest tag is v3.4.0",
+      "details": {
+        "documented": "1.8.0",
+        "source": "git-tag",
+        "actual": "v3.4.0",
+        "fix_type": "auto"
+      }
+    },
+    {
+      "path": "README.md",
+      "line": 1,
+      "column": 1,
+      "severity": "low",
+      "category": "structural",
+      "rule": "missing-section",
+      "message": "README has no installation section",
+      "details": {
+        "section": "installation",
+        "fix_type": "semi"
+      }
+    },
+    {
+      "path": "docs/api.md",
+      "line": 1,
+      "column": 1,
+      "severity": "high",
+      "category": "temporal",
+      "rule": "stale-doc",
+      "message": "documentation not updated in 428 days",
+      "details": {
+        "last_commit": "2025-06-15",
+        "age_days": 428,
+        "fix_type": "manual"
+      }
+    },
+    {
+      "path": "docs/api.md",
+      "line": 1,
+      "column": 1,
+      "severity": "high",
+      "category": "factual",
+      "rule": "code-churn",
+      "message": "src/handlers changed in 34 commits since this doc was last updated",
+      "details": {
+        "code_dir": "src/handlers",
+        "commits": 34,
+        "fix_type": "manual"
+      }
+    },
+    {
+      "path": "docs/deployment.md",
+      "line": 22,
+      "column": 9,
+      "severity": "high",
+      "category": "referential",
+      "rule": "dead-link",
+      "message": "links to scripts/deploy.sh, which does not exist",
+      "details": {
+        "target": "scripts/deploy.sh",
+        "fix_type": "auto"
+      }
+    },
+    {
+      "path": "docs/deployment.md",
+      "line": 31,
+      "column": 4,
+      "severity": "high",
+      "category": "referential",
+      "rule": "renamed-reference",
+      "message": "references deploy.sh, which was renamed to bin/deploy.sh",
+      "details": {
+        "reference": "scripts/deploy.sh",
+        "renamed_to": "bin/deploy.sh",
+        "fix_type": "auto"
+      }
+    },
+    {
+      "path": "docs/notes.md",
+      "severity": "info",
+      "category": "temporal",
+      "rule": "untracked-doc",
+      "message": "file has no git history, so staleness cannot be reckoned",
+      "details": {
+        "fix_type": "manual"
+      }
+    }
+  ]
+}

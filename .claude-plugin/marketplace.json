@@ -21,6 +21,50 @@
         "skill-creator",
         "starter"
       ]
+    },
+    {
+      "name": "garden",
+      "source": "./plugins/garden",
+      "description": "Tends a knowledge base over time: creates one, surveys it into a typed backlog of work items, then works the backlog down one item at a time.",
+      "version": "2.2.0",
+      "keywords": [
+        "knowledge-base",
+        "docs",
+        "drift",
+        "backlog"
+      ]
+    },
+    {
+      "name": "likec4",
+      "source": "./plugins/likec4",
+      "description": "C4 architecture models in LikeC4 that stay true to the code: evidence rules, fact-gathering, drift maintenance and review, plus the LikeC4 MCP server for querying the model.",
+      "version": "0.1.0",
+      "keywords": [
+        "likec4",
+        "c4",
+        "architecture",
+        "diagrams",
+        "mcp"
+      ]
+    },
+    {
+      "name": "likec4-dsl",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/likec4/likec4.git",
+        "path": "skills",
+        "ref": "main"
+      },
+      "strict": false,
+      "skills": [
+        "./likec4-dsl"
+      ],
+      "description": "Upstream LikeC4 DSL and CLI syntax skill, tracked from likec4/likec4 main.",
+      "keywords": [
+        "likec4",
+        "dsl",
+        "upstream"
+      ]
     }
   ]
 }

@@ -1,0 +1,16 @@
+{
+  "name": "likec4",
+  "version": "0.1.0",
+  "description": "C4 architecture models in LikeC4 that stay true to the code: evidence rules, fact-gathering, drift maintenance and review, plus the LikeC4 MCP server for querying the model.",
+  "author": {
+    "name": "Amir Arad",
+    "email": "greenshade@gmail.com"
+  },
+  "keywords": [
+    "likec4",
+    "c4",
+    "architecture",
+    "diagrams",
+    "mcp"
+  ]
+}
