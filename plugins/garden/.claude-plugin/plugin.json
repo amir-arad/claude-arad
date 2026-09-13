@@ -1,6 +1,6 @@
 {
   "name": "garden",
-  "version": "2.2.0",
+  "version": "3.0.0",
   "description": "Explicit commands for any git repo that has or is a knowledge base: init, survey, tend, maintain, review, capture, restructure, dream.",
   "author": {
     "name": "Amir Arad",
