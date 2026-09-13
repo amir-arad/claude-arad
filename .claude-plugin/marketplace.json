@@ -25,7 +25,7 @@
     {
       "name": "garden",
       "source": "./plugins/garden",
-      "description": "Tends a knowledge base over time: creates one, surveys it into a typed backlog of work items, then works the backlog down one item at a time.",
+      "description": "Explicit commands for any git repo that has or is a knowledge base: init, survey, tend, maintain, review, capture, restructure, dream.",
       "version": "2.2.0",
       "keywords": [
         "knowledge-base",
