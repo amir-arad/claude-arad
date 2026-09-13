@@ -48,6 +48,18 @@
       ]
     },
     {
+      "name": "context",
+      "source": "./plugins/context",
+      "description": "Context management across sessions: carryout writes a self-contained handoff prompt so a fresh Claude can resume the work.",
+      "version": "0.1.0",
+      "keywords": [
+        "context",
+        "handoff",
+        "carryout",
+        "continuation"
+      ]
+    },
+    {
       "name": "likec4-dsl",
       "source": {
         "source": "git-subdir",

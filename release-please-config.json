@@ -63,6 +63,17 @@
           "jsonpath": "$.version"
         }
       ]
+    },
+    "plugins/context": {
+      "component": "context",
+      "changelog-path": "CHANGELOG.md",
+      "extra-files": [
+        {
+          "type": "json",
+          "path": ".claude-plugin/plugin.json",
+          "jsonpath": "$.version"
+        }
+      ]
     }
   }
 }
