@@ -26,7 +26,7 @@
       "name": "garden",
       "source": "./plugins/garden",
       "description": "Explicit commands for any git repo that has or is a knowledge base: init, survey, tend, maintain, review, capture, restructure, dream.",
-      "version": "2.2.0",
+      "version": "3.0.0",
       "keywords": [
         "knowledge-base",
         "docs",
