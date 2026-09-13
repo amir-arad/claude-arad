@@ -7,7 +7,7 @@
 <!-- PROJECT TITLE -->
 <br />
 <div align="center">
-  <a href="https://github.com/Nagell/claude-marketplace">
+  <a href="https://github.com/amir-arad/claude-arad">
     <img src="assets/logo.svg" alt="Logo" width="80" height="80">
   </a>
   <h3 align="center">Claude Marketplace Template</h3>
@@ -84,11 +84,11 @@ This is a GitHub template, not a fork. Hit **Use this template**, swap the place
 Once it's pushed and public, anyone (including you, on any machine) installs your plugins with:
 
 ```sh
-/plugin marketplace add CHANGE_ME_USERNAME/CHANGE_ME_REPO
-/plugin install base-plugin@my-marketplace
+/plugin marketplace add amir-arad/claude-arad
+/plugin install base-plugin@claude-arad
 ```
 
-`base-plugin@my-marketplace` is `<plugin-name>@<marketplace-name>` - the marketplace name comes from the `name` field in `.claude-plugin/marketplace.json`.
+`base-plugin@claude-arad` is `<plugin-name>@<marketplace-name>` - the marketplace name comes from the `name` field in `.claude-plugin/marketplace.json`.
 
 ### 2. Placeholders to change
 
@@ -223,9 +223,9 @@ One exception: the `plugins/base-plugin/skills/skill-creator/` skill is Anthropi
 
 ## Contact
 
-CHANGE_ME
+Amir Arad - greenshade@gmail.com
 
-Project Link: <https://github.com/CHANGE_ME_USERNAME/CHANGE_ME_REPO>
+Project Link: <https://github.com/amir-arad/claude-arad>
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

@@ -3,8 +3,8 @@
 	"version": "0.1.0",
 	"description": "Base plugin for your marketplace. Ships the skill-creator skill, plus a sample hook to replace with your own.",
 	"author": {
-		"name": "CHANGE_ME",
-		"email": "CHANGE_ME@example.com"
+		"name": "Amir Arad",
+		"email": "greenshade@gmail.com"
 	},
 	"keywords": [
 		"base",

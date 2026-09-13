@@ -1,13 +1,13 @@
 {
-  "name": "my-marketplace",
+  "name": "claude-arad",
   "owner": {
-    "name": "CHANGE_ME"
+    "name": "Amir Arad"
   },
   "version": "1.0.0",
   "description": "A starter Claude Code marketplace. Add your own plugins and ship them with automated versioning.",
   "author": {
-    "name": "CHANGE_ME",
-    "email": "CHANGE_ME@example.com"
+    "name": "Amir Arad",
+    "email": "greenshade@gmail.com"
   },
   "plugins": [
     {
