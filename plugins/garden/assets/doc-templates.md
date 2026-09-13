@@ -46,8 +46,7 @@ Sourcing:
 - **Diagram** — nodes come from what you confirmed exists (entry points, services in the
   compose/k8s manifests, datastores named in config); **edges come only from imports and calls
   you read**. `scan` gives `entry_points`, `top_directories`, and `tree` as the starting
-  inventory — it does not give you edges, and does not draw the diagram. See SKILL.md,
-  "What the scripts deliberately do NOT do".
+  inventory — it does not give you edges, and does not draw the diagram.
 - **Layer rows** — one row per layer the code actually supports. Do not emit a layer because a
   directory is named after it.
 - **Technology + version** — `tech_stack` and `frameworks` from `scan`, with versions read

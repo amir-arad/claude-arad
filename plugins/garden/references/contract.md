@@ -1,12 +1,12 @@
 # The machine contract
 
-Every script in `scripts/` conforms to this document. It exists so the analyses compose:
+Every script in `lib/` conforms to this document. It exists so the analyses compose:
 one tool's output is another tool's input, and a finding means the same thing everywhere.
 `backlog-merge.mjs` depends on that being true.
 
 This was a cross-skill standard, back when four skills implemented it and `lib.mjs` was
-vendored byte-identical into each of them. They are now one skill, so this is internal
-design notes and `scripts/lib.mjs` is an ordinary module. The contract is still worth
+vendored byte-identical into each of them. They are now one plugin, so this is internal
+design notes and `lib/lib.mjs` is an ordinary module. The contract is still worth
 holding to: it is what lets a new analysis be written without renegotiating what a finding
 is.
 
@@ -160,7 +160,7 @@ them inside the same skill.
 
 ## 8. The shared lib
 
-`scripts/lib.mjs` is the one home for shared code. It used to be vendored byte-identical
+`lib/lib.mjs` is the one home for shared code. It used to be vendored byte-identical
 into four sibling skills, with a `vendor.mjs --check` to catch drift; consolidating those
 skills removed both the copies and the need for the check.
 

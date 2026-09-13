@@ -4,6 +4,7 @@ import path from 'node:path';
 import {
   parseArgs, positionalRoot, asOf, finding, envelope, gate, emit, exists, fail,
   parseBacklog, parseReason, fileRevisions, gitToplevel, rel, isoDate,
+  resolveBacklogPath, isStateDir, LEGACY_STATE_DIR,
 } from './lib.mjs';
 
 const HELP = `suppression-review.mjs — read a backlog's "won't do" section back.
@@ -17,7 +18,8 @@ Arguments:
 
 Options:
   --backlog <file>        backlog markdown file
-                          (default: <root>/.kb-gardener/backlog.md)
+                          (default: <root>/.garden/backlog.md, or the legacy
+                          .kb-gardener/backlog.md when only that exists)
   --json                  emit the envelope as JSON instead of text
   --as-of YYYY-MM-DD      date the run is reckoned against (default: today)
   --min-severity <level>  gate for the exit code: critical|high|medium|low|info
@@ -65,7 +67,10 @@ const minSeverity = args['min-severity'] ?? 'low';
 
 const backlogPath = args.backlog
   ? path.resolve(args.backlog)
-  : path.join(root, '.kb-gardener', 'backlog.md');
+  : resolveBacklogPath(root);
+if (path.basename(path.dirname(backlogPath)) === LEGACY_STATE_DIR) {
+  process.stderr.write(`note: reading legacy ${LEGACY_STATE_DIR}/ — run /garden:init to migrate it to .garden/\n`);
+}
 if (!exists(backlogPath)) {
   console.log(`no backlog at ${backlogPath} — nothing to review`);
   process.exit(0);
@@ -73,9 +78,9 @@ if (!exists(backlogPath)) {
 
 // Targets are relative to the repo root, not to the backlog file's own directory. Same rule
 // backlog-merge.mjs follows, and for the same reason: source-discoverability items name
-// paths above .kb-gardener/.
+// paths above .garden/.
 const dir = path.dirname(backlogPath);
-const base = path.basename(dir) === '.kb-gardener' ? path.dirname(dir) : dir;
+const base = isStateDir(path.basename(dir)) ? path.dirname(dir) : dir;
 
 const text = fs.readFileSync(backlogPath, 'utf8');
 const parsed = parseBacklog(text, base, { strict: true });

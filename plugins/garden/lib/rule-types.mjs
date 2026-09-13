@@ -7,7 +7,7 @@
  * stderr the first time such a rule is emitted.
  *
  * The reason for the hard drop: the six types in `references/work-item-types.md` are the only
- * ones with done criteria, and Part B verifies a fix by looking its type up there. An item
+ * ones with done criteria, and `tend` verifies a fix by looking its type up there. An item
  * typed with a bare rule name looks valid, parses fine, and can never be verified — the fix
  * either passes vacuously or fails for the wrong reason. Fabricating a type is worse than
  * losing the finding, which the summary reports either way.
@@ -27,7 +27,7 @@ export const RULE_TO_TYPE = new Map(Object.entries({
 
   // The doc is wrong about something checkable, or nobody has looked at it inside its SLA.
   // work-item-types.md prefers the evidence claims below over the calendar claims when both
-  // fire on one doc; that reconciliation happens in Part A prose, not here.
+  // fire on one doc; that reconciliation happens in `survey` prose, not here.
   'stale-doc': 'stale-doc',
   'review-overdue': 'stale-doc',
   'code-churn': 'stale-doc',
@@ -95,7 +95,7 @@ export const DISCARDED_RULES = new Map(Object.entries({
 }));
 
 /**
- * Real signals that no type's done criteria fit. They are surfaced to Part A as advisory
+ * Real signals that no type's done criteria fit. They are surfaced to `survey` as advisory
  * counts rather than written as items, because deciding what they mean takes cross-doc
  * judgment — exactly the hand-raised path `duplication` and `re-balancing` already describe.
  */

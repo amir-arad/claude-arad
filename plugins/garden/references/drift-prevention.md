@@ -1,6 +1,6 @@
 # Drift Prevention Guide
 
-Read this when the question is how to stop drift recurring, rather than how to detect it. Detection lives in `../SKILL.md`; interpreting what came back lives in `rule-catalogue.md`.
+Read this when the question is how to stop drift recurring, rather than how to detect it. Detection lives in `../skills/survey/SKILL.md`; interpreting what came back lives in `rule-catalogue.md`.
 
 ## Documentation-code coupling
 
@@ -72,9 +72,8 @@ The right-hand column is the point: three of these are detectable and four are n
 ## CI gates
 
 There is no longer a standalone CI recipe. The per-tool GitHub Actions and pre-commit
-snippets lived in the doc-drift-detector skill, and consolidating it into kb-gardener
-removed the standalone entry point they documented — see `../SKILL.md` § "What 2.0
-absorbed".
+snippets lived in the doc-drift-detector skill, and consolidating it into the
+garden plugin removed the standalone entry point they documented.
 
 To gate a pull request on doc health now, run a survey and gate on its exit code. Every
 analysis script honours `--min-severity` and the contract exit codes (`0` clean, `1`

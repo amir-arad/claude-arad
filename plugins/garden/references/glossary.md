@@ -5,15 +5,15 @@ shapes; this settles the words in prose. Where a term below collides with a fiel
 `CONTRACT.md`, the contract wins and this file explains how to talk about it.
 
 The rule behind every entry: **one concept, one word, everywhere.** A reader moving between
-`knowledge-ops`, `doc-drift-detector`, `codebase-onboarding`, and `kb-gardener` should never
-have to work out whether two skills mean the same thing by different names.
+`init`, `survey`, `tend`, `maintain`, `review`, `capture`, `restructure` and `dream` should never
+have to work out whether two commands mean the same thing by different names.
 
 ## The table
 
 | Preferred term | Retired synonyms | Meaning |
 |---|---|---|
 | **finding** | issue, drift instance, problem, check result, gap, debt | What a detector emits: one `CONTRACT.md` §1 record, per-tool, unreconciled. Has `severity`, `category`, `rule`. Does not have an owner, an estimate, or a definition of done. |
-| **work item** | ticket, task, backlog entry, debt item, action | What survives reconciliation across tools into a backlog. Has a type from kb-gardener's `references/work-item-types.md` and done criteria. Several findings can collapse into one work item; some findings become none. |
+| **work item** | ticket, task, backlog entry, debt item, action | What survives reconciliation across tools into a backlog. Has a type from `references/work-item-types.md` and done criteria. Several findings can collapse into one work item; some findings become none. |
 | **doc** | page, document, artifact, article, wiki page | A markdown file with a `CONTRACT.md` §7 doc extension. Use `doc` in prose and in rule names (`stale-doc`, `thin-doc`, `orphan-doc`). |
 | **severity** | criticality, priority, impact | How bad a finding is: `critical` `high` `medium` `low` `info`. A property of a finding only. |
 | **tier** | criticality, importance, doc priority | The consequence if a doc is wrong: `critical` `core` `reference` `archive`. A property of a doc, recorded in inventory data, never on a finding. |
@@ -104,5 +104,5 @@ module this code belongs to". That second sense is now **module assignment** and
 
 Deletion advocacy in prose is addressed to **a human with confirmed deletion authority**.
 Automated and agent-driven runs never delete: knowledge-ops' non-interactive defaults archive
-or redirect only, and kb-gardener forbids agent deletion outright. Any passage recommending
+or redirect only, and garden forbids agent deletion outright. Any passage recommending
 deletion must name which of the two situations it is talking about.
