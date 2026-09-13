@@ -3,6 +3,7 @@ import path from 'node:path';
 import {
   parseArgs, positionalRoot, asOf, finding, envelope, gate, emit, exists, fail,
   parseBacklog, fileRevisions, gitToplevel, rel, isoDate, parsePositiveInt,
+  resolveBacklogPath, isStateDir, LEGACY_STATE_DIR,
 } from './lib.mjs';
 
 const HELP = `backlog-history.mjs — what happened to every work item, from git history.
@@ -17,7 +18,8 @@ Arguments:
 
 Options:
   --backlog <file>        backlog markdown file
-                          (default: <root>/.kb-gardener/backlog.md)
+                          (default: <root>/.garden/backlog.md, or the legacy
+                          .kb-gardener/backlog.md when only that exists)
   --json                  emit the envelope as JSON instead of text
   --as-of YYYY-MM-DD      date the run is reckoned against (default: today).
                           Revisions committed after it are not read.
@@ -70,13 +72,16 @@ const maxRevisions = args['max-revisions'] ? parsePositiveInt(args['max-revision
 
 const backlogPath = args.backlog
   ? path.resolve(args.backlog)
-  : path.join(root, '.kb-gardener', 'backlog.md');
+  : resolveBacklogPath(root);
+if (path.basename(path.dirname(backlogPath)) === LEGACY_STATE_DIR) {
+  process.stderr.write(`note: reading legacy ${LEGACY_STATE_DIR}/ — run /garden:init to migrate it to .garden/\n`);
+}
 if (!exists(backlogPath)) {
   console.log(`no backlog at ${backlogPath} — nothing to replay`);
   process.exit(0);
 }
 const dir = path.dirname(backlogPath);
-const base = path.basename(dir) === '.kb-gardener' ? path.dirname(dir) : dir;
+const base = isStateDir(path.basename(dir)) ? path.dirname(dir) : dir;
 
 const repo = gitToplevel(base);
 const history = repo

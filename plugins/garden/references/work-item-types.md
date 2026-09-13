@@ -1,7 +1,7 @@
 # Work Item Types
 
-The taxonomy both halves of kb-gardener agree on. Part A classifies every finding into exactly
-one of these six types; Part B looks the type up here to decide whether the fix it just
+The taxonomy `survey` and `tend` agree on. `survey` classifies every finding into exactly
+one of these six types; `tend` looks the type up here to decide whether the fix it just
 dispatched actually landed.
 
 Item line format is fixed by `assets/backlog-template.md`:
@@ -10,9 +10,9 @@ Item line format is fixed by `assets/backlog-template.md`:
 - [<type>] <target> — <description>
 ```
 
-Read the **done criteria** as the contract they are. Part B checks them *after* the fix
+Read the **done criteria** as the contract they are. `tend` checks them *after* the fix
 subagent returns and *before* deleting the item; a fix that fails them does not get retried —
-the item moves to `## won't do` with a reason attributed to `(kb-gardener)`. That makes a vague
+the item moves to `## won't do` with a reason attributed to `(garden)`. That makes a vague
 criterion worse than no criterion: it either passes everything (item deleted, problem still
 there) or fails everything (item retired, problem never worked again). Every criterion below is
 written so an agent that just made the edit can confirm it by reading named files. If you add a
@@ -28,7 +28,7 @@ context you have now.
 Three fields, one line, separated by `;`:
 
 ```
-- [re-balancing] kb/deploy.md — attempted: cut at the H2 seams; observed: the config walkthrough spans sections 2 and 4, both halves broke; revisit if: config material moves into its own section (kb-gardener)
+- [re-balancing] kb/deploy.md — attempted: cut at the H2 seams; observed: the config walkthrough spans sections 2 and 4, both halves broke; revisit if: config material moves into its own section (garden)
 ```
 
 - **`attempted:`** what was tried.
@@ -70,7 +70,7 @@ line accidentally mutes an entire subtree.
 the SLA check, with no drift evidence behind it, is the weaker finding: on a personal KB most
 docs have no `updated` frontmatter at all and the SLA check degenerates into "this file is old",
 which is not a defect. Emit it only when the KB actually carries freshness frontmatter, and say
-in the description that the basis is date-only so Part B knows the fix is a review pass rather
+in the description that the basis is date-only so `tend` knows the fix is a review pass rather
 than a correction. When the two sources point at the same file, the git evidence wins the
 description outright — a date is never the reason to edit a doc.
 
@@ -78,7 +78,7 @@ description outright — a date is never the reason to edit a doc.
 the drift evidence named: renamed symbols, moved paths, changed commands, superseded version
 strings. Do not rewrite the doc wholesale; a rewrite makes the done criteria uncheckable and
 buries the real correction in diff noise. If the doc describes something that no longer exists
-at all, that is not a `stale-doc` fix — retire the item and let the next Part A run classify it
+at all, that is not a `stale-doc` fix — retire the item and let the next `survey` run classify it
 as `duplication` or `broken-reference`, whichever it actually is.
 
 **Done criteria.**
@@ -109,7 +109,7 @@ advisory `ambiguous-reference` instead. `renamed-reference` is the same defect w
 attached, and lands here too: the fix is to repoint the reference, which is what the criteria
 below check, not to correct a claim, which is what `stale-doc` checks.
 
-External URLs are out of scope for this type. Nothing in kb-gardener makes network requests, and
+External URLs are out of scope for this type. Nothing in garden makes network requests, and
 a link that 404s on someone else's server is not a defect in this KB that an agent can verify a
 fix for.
 
@@ -137,7 +137,7 @@ Two docs linking to the same missing doc are two items, because they are two edi
 ## `duplication`
 
 **Detection signal.** `knowledge-ops`' `duplicate-title` rule: two or more docs announcing the
-same concept under the same title. Part A also raises this type by hand — when two docs
+same concept under the same title. `survey` also raises this type by hand — when two docs
 surfaced by different siblings turn out to describe the same thing, or when one doc restates a
 section of another with no link between them. Those hand-raised cases have no rule behind them;
 say in the description what the overlap actually is.
@@ -169,16 +169,16 @@ the description. This keeps one item per merge rather than one per cluster.
 
 ## `indexing-discoverability`
 
-**Detection signal.** kb-gardener's own analysis, defined in `references/discoverability.md`: a
+**Detection signal.** garden's own analysis, defined in `references/discoverability.md`: a
 doc is not reachable by walking markdown links from the root doc, or it is reachable but a hop
 on the path to it is not signposted under a term a reader would search for.
 
 **This type subsumes inbound-link counting.** The old orphan-detector emitted
 the `orphan-doc` rule by counting inbound links per doc. Reachability is strictly stronger: a
 doc with three inbound links from docs that are themselves unreachable passes that check and
-fails this one. So when Part A reconciles findings, **an unreachable doc produces exactly one
+fails this one. So when `survey` reconciles findings, **an unreachable doc produces exactly one
 `indexing-discoverability` item.** There is no `orphan` type in this taxonomy — `orphan-doc` is
-a rule string on the sibling's finding and nothing more, and Part A collapses those findings
+a rule string on the sibling's finding and nothing more, and `survey` collapses those findings
 into this type rather than emitting them in parallel. One unreachable doc, one fix, one item.
 
 **What a fix looks like.** Add the doc to the index or hub doc that a reader would plausibly
@@ -207,13 +207,13 @@ which is expected: the target names the problem, not the file that changes.
 
 **Detection signal.** `cite-scan.mjs`: a source directory with zero citations to any KB doc,
 reported as a per-directory count including zero. The script reports counts and edges only. It
-does **not** decide which code deserves documentation — that judgment happens in Part A prose,
+does **not** decide which code deserves documentation — that judgment happens in `survey` prose,
 weighing whether a doc explaining this directory already exists elsewhere in the KB. A directory
 of generated code, vendored code, or tests with zero citations is a fact, not a finding.
 
 An item is raised only when a KB doc exists that explains this code and the code does not point
 at it. "Uncited directory with no doc anywhere" is a documentation gap, which is
-`codebase-onboarding`'s job and not a kb-gardener work item.
+`init`'s job and not a garden work item.
 
 **What a fix looks like.** Add a citation comment at the top of the directory's entry-point
 source file — the module's index, its main class, or its most-imported file — naming the KB doc
@@ -238,7 +238,7 @@ means a `won't do` on `src/generated/` correctly silences the whole tree in one 
 
 ## `re-balancing`
 
-**Detection signal.** kb-gardener's own analysis over the doc inventory. Two shapes:
+**Detection signal.** garden's own analysis over the doc inventory. Two shapes:
 
 - **Split**: one doc covering several distinct topics that readers would arrive at separately —
   visible as a long file whose top-level headings have little to do with each other, and whose
@@ -283,12 +283,12 @@ Changing a rule's classification changes item identity, which is `[type]` + targ
 at once. `backlog-merge.mjs --migrate-types` rewrites an existing backlog's type names in both
 sections; run it once when this table changes, or the next survey looks like a regression.
 
-`scripts/rule-types.mjs` is the machine copy of this document: every rule a detector emits is
+`lib/rule-types.mjs` is the machine copy of this document: every rule a detector emits is
 classified there as mapped to one of the six types above, deliberately discarded, or advisory.
 A rule in none of the three is a bug in that file, and `backlog-merge.mjs` drops its findings
 rather than inventing a type for them.
 
-**Why dropping beats inventing.** The done criteria above are the contract Part B verifies a
+**Why dropping beats inventing.** The done criteria above are the contract `tend` verifies a
 fix against. An item typed `[code-churn]` or `[thin-doc]` parses fine, reads as a normal item,
 and has no criteria to look up — so the fix either passes vacuously or the item is retired to
 `won't do` for failing a check that was never written. That is the vague-criterion failure this
@@ -298,17 +298,17 @@ recoverable; an unverifiable item is neither.
 **Advisory rules** are the third case: real signals whose fix no type can verify. `thin-doc`
 (a merge candidate only relative to its siblings), `missing-section` (a doc-shape convention),
 `duplicate-anchor` (an ambiguous heading slug) and `ambiguous-reference` (shorthand matching
-several real files) are reported to Part A as counts. Part A may
+several real files) are reported to `survey` as counts. `survey` may
 raise a typed item by hand from them, exactly as `duplication` and `re-balancing` already
-expect — with a description naming what the overlap or the seam actually is. What Part A must
+expect — with a description naming what the overlap or the seam actually is. What `survey` must
 not do is copy the rule name into the type column.
 
 ---
 
 ## Not a type: `ownership-gap`
 
-`knowledge-ops` reports docs with no `owner` frontmatter and no named maintainer. **kb-gardener
-does not emit this as a work item, and Part A discards those findings.**
+`knowledge-ops` reports docs with no `owner` frontmatter and no named maintainer. **garden
+does not emit this as a work item, and `survey` discards those findings.**
 
 It fires on every doc of a personal KB, because a personal KB has exactly one owner and does
 not write it down. A finding that matches every document carries no information; it just makes

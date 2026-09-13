@@ -141,7 +141,7 @@ The workflow auto-commits to `main`, so a working `dev` branch saves you constan
 | Plugin                              | Description                                                          |
 | ----------------------------------- | -------------------------------------------------------------------- |
 | [base-plugin](plugins/base-plugin/) | Ships the `skill-creator` skill, plus a sample hook |
-| [garden](plugins/garden/)           | Creates, surveys and tends a knowledge base via a typed backlog |
+| [garden](plugins/garden/)           | Knowledge-base commands: init, survey, tend, maintain, review, capture, restructure, dream |
 | [likec4](plugins/likec4/)           | C4 modeling method for LikeC4, plus the LikeC4 MCP server |
 | [context](plugins/context/)         | `carryout`: handoff prompt so a fresh Claude can resume the work |
 | likec4-dsl (external)               | Upstream LikeC4 DSL skill, tracked from likec4/likec4 `main` |

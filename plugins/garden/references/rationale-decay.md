@@ -27,8 +27,7 @@ rationale goes to zero. The decay of the *reason* is sufficient on its own.
 - The only affordable deletion left is the wholesale rewrite — removing one entry needs a
   reason, removing all of them needs none. Which resets size and not the cause.
 - A durable suppression list goes quietly blind: entries accumulate, none can be safely
-  removed, and nothing reports the loss of coverage. See `detector-noise.md` §3 for the
-  version of this driven by false positives; this is the version driven by time alone.
+  removed, and nothing reports the loss of coverage.
 
 ## The bar a reason has to clear
 
@@ -71,7 +70,3 @@ structural analogy: a suppression reason and a prompt comment occupy the same po
 durable free text that licenses a future decision, which nothing verifies — but nobody has run
 the ablation on one. Treat the three-field grammar as a well-motivated convention, not a
 validated one.
-
-The repository this skill lives in keeps a fuller note at `kb/rationale-decay.md`, including the
-observational numbers. That file is outside this skill folder and will not exist if the skill is
-copied elsewhere; this file is the self-contained version.

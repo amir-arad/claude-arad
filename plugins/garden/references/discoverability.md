@@ -89,8 +89,8 @@ For each unreachable doc, emit one item:
 ```
 
 When a whole cluster is unreachable, still emit one item per doc — but say in the description
-which cluster it belongs to, so Part B fixing one can see the others fall out of the same edit.
-The next Part A run will then find them reachable and the items never get picked.
+which cluster it belongs to, so `tend` fixing one can see the others fall out of the same edit.
+The next `survey` run will then find them reachable and the items never get picked.
 
 ---
 
@@ -161,7 +161,7 @@ Both are legitimate; the second is right when the whole KB says "ship".
 - [indexing-discoverability] docs/ops/deploy.md — reachable, but hop CLAUDE.md → docs/ops/deploy.md is unsignposted: link text "How we ship" contains no subject term of "Deploying services"
 ```
 
-Quote the link text and name the target's subject terms. Part B needs both to know whether the
+Quote the link text and name the target's subject terms. `tend` needs both to know whether the
 fix is rewriting the link or recording a synonym.
 
 ---
@@ -173,11 +173,11 @@ agree, and it is the KB's own recorded vocabulary rather than a general thesauru
 
 ### Location and format
 
-`.kb-gardener/synonyms.md`, next to `backlog.md` in the target KB, git-tracked and
+`.garden/synonyms.md`, next to `backlog.md` in the target KB, git-tracked and
 hand-editable. One line per synonym group:
 
 ```markdown
-# kb-gardener synonym list
+# garden synonym list
 
 deploy: ship, release, rollout
 auth: authentication, login, sign-in
@@ -203,11 +203,11 @@ is done criterion 3 for the type. Two properties follow, and both are the point:
 
 - **Every entry was earned by a real hop in this KB.** Nothing is in the list because a thesaurus
   suggested it.
-- **The list is auditable.** A human reading the diff sees "kb-gardener now thinks `ship` means
+- **The list is auditable.** A human reading the diff sees "garden now thinks `ship` means
   `deploy` here" and can reject it at the merge gate, which is where all human review in this
   design lives.
 
-The list only grows. Removing an entry is a human edit; kb-gardener never prunes it, because a
+The list only grows. Removing an entry is a human edit; garden never prunes it, because a
 removal silently un-signposts hops elsewhere in the KB and the resulting items would appear with
 no visible cause.
 

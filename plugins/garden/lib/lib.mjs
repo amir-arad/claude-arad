@@ -1,7 +1,7 @@
-// Shared helpers for every kb-gardener script.
+// Shared helpers for every garden script.
 //
 // This was the repo's shared standards lib, vendored byte-identical into four sibling
-// skills. Those siblings were consolidated into kb-gardener, so this is now an ordinary
+// skills. Those siblings were consolidated into the garden plugin, so this is now an ordinary
 // module with a single home — edit it here.
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
@@ -11,7 +11,21 @@ import { KNOWN_RULES } from './rule-types.mjs';
 export const SKIP_DIRS = new Set([
   '.git', '.hg', '.svn', 'node_modules', '__pycache__', '.venv', 'venv', '.tox',
   'dist', 'build', 'out', 'coverage', '.next', 'target',
+  '.garden', '.kb-gardener',
 ]);
+
+/** The state directory holding backlog.md and synonyms.md, at the repository root. */
+export const STATE_DIR = '.garden';
+/** Its name before the plugin rename. `init` migrates it; readers still accept it. */
+export const LEGACY_STATE_DIR = '.kb-gardener';
+export const isStateDir = (name) => name === STATE_DIR || name === LEGACY_STATE_DIR;
+
+/** Default backlog path: .garden/backlog.md, or the legacy one when only that exists. */
+export function resolveBacklogPath(root) {
+  const current = path.join(root, STATE_DIR, 'backlog.md');
+  const legacy = path.join(root, LEGACY_STATE_DIR, 'backlog.md');
+  return !fs.existsSync(current) && fs.existsSync(legacy) ? legacy : current;
+}
 
 export const DOC_EXTENSIONS = new Set(['.md', '.markdown', '.mdown', '.mkd']);
 
@@ -569,7 +583,7 @@ export function parseBacklog(text, root, { strict = false } = {}) {
  */
 export function parseReason(description) {
   const raw = String(description ?? '').trim();
-  const attr = /\((human|kb-gardener[^)]*)\)\s*$/i.exec(raw);
+  const attr = /\((human|garden(?:,[^)]*)?|kb-gardener(?:,[^)]*)?)\)\s*$/i.exec(raw);
   const body = attr ? raw.slice(0, attr.index).trim() : raw;
   const field = (label) => {
     const re = new RegExp(`(?:^|;)\\s*${label}\\s*:\\s*([\\s\\S]*?)(?=;\\s*(?:attempted|observed|revisit if)\\s*:|$)`, 'i');
@@ -649,7 +663,7 @@ function warnUnclassifiedRule(rule) {
   if (KNOWN_RULES.has(rule) || warnedRules.has(rule)) return;
   warnedRules.add(rule);
   process.stderr.write(
-    `warning: rule "${rule}" is not classified in scripts/rule-types.mjs; `
+    `warning: rule "${rule}" is not classified in lib/rule-types.mjs; `
     + 'backlog-merge.mjs will drop its findings\n',
   );
 }

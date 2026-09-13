@@ -1,7 +1,7 @@
-# kb-gardener backlog
+# garden backlog
 
 <!--
-FORMAT CONTRACT — both halves of kb-gardener and backlog-merge.mjs depend on this.
+FORMAT CONTRACT — survey, tend and backlog-merge.mjs depend on this.
 
 Item line:  - [<type>] <target> — <description>
   <type>        one of the types in references/work-item-types.md, in square brackets
@@ -12,8 +12,10 @@ Item line:  - [<type>] <target> — <description>
                 description is silently truncated at the newline and any field after the
                 wrap is lost. Long reasons stay long; they do not wrap.
 
-won't-do lines carry a trailing attribution: "(human)", "(kb-gardener)", or
-"(kb-gardener, cycle YYYY-MM-DD)" when retired by an unattended cycle run.
+won't-do lines carry a trailing attribution: "(human)", "(garden)", or
+"(garden, maintain YYYY-MM-DD)" when retired by an unattended maintain run. Entries
+attributed "(kb-gardener)" or "(kb-gardener, cycle YYYY-MM-DD)" predate the plugin rename
+and are read the same way.
 
 A won't-do <description> records why, in three fields, separated by ";":
     attempted: <what was tried>
@@ -45,4 +47,4 @@ verbatim by backlog-merge.mjs.
 ## won't do
 
 - [stale-doc] docs/adr/ — attempted: none; observed: ADRs are immutable once accepted, so correcting one would falsify the record; revisit if: an ADR is ever superseded in place (human)
-- [re-balancing] docs/ops/api.md — attempted: cut at the H2 seams; observed: the auth walkthrough spans sections 2 and 4, both halves broke; revisit if: auth moves into its own section (kb-gardener)
+- [re-balancing] docs/ops/api.md — attempted: cut at the H2 seams; observed: the auth walkthrough spans sections 2 and 4, both halves broke; revisit if: auth moves into its own section (garden)

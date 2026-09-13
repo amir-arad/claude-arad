@@ -3,11 +3,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {
   parseArgs, fail, exists, normalizePath, pathKey, readFindingsPayload,
-  parseBacklog, parseReason, BACKLOG_ITEM,
+  parseBacklog, parseReason, BACKLOG_ITEM, isStateDir,
 } from './lib.mjs';
 import { classify, RULE_TO_TYPE, DISCARDED_RULES, ADVISORY_RULES } from './rule-types.mjs';
 
-const HELP = `backlog-merge.mjs — merge CONTRACT findings into a kb-gardener backlog.
+const HELP = `backlog-merge.mjs — merge CONTRACT findings into a garden backlog.
 
 Usage:
   node backlog-merge.mjs --backlog <file> --findings <file|-> [--stdout] [--dry-run] [--json]
@@ -29,23 +29,23 @@ Options:
 Default behaviour rewrites the backlog file in place and prints a summary.
 
 Finding -> backlog item:
-  finding.rule    -> item [type], via scripts/rule-types.mjs
+  finding.rule    -> item [type], via lib/rule-types.mjs
   finding.path    -> item target, re-relativised from the envelope root to the
                      backlog root: the backlog file's directory, or its parent when
-                     that directory is ".kb-gardener" (the standard location, where
+                     that directory is ".garden" or ".kb-gardener" (the standard location, where
                      targets name paths in the repository above it)
   finding.message -> item description
 
-  Every rule is classified in scripts/rule-types.mjs as one of:
+  Every rule is classified in lib/rule-types.mjs as one of:
     mapped        -> one of the six types in references/work-item-types.md
     discarded     -> deliberately not a work item (ownership, frontmatter
                      metadata, repository scaffolding, external URLs)
     advisory      -> a real signal no type's done criteria fit; counted for
-                     Part A to judge by hand, never written as an item
+                     survey to judge by hand, never written as an item
     unclassified  -> a bug in rule-types.mjs. The finding is DROPPED and
                      reported, never written with the rule name as its type:
                      an item whose type has no done criteria cannot be verified
-                     by Part B, and looks valid while being unverifiable.
+                     by tend, and looks valid while being unverifiable.
 
   Run with --rules to print the whole classification table.
 
@@ -73,13 +73,13 @@ Migrating an existing backlog:
     node backlog-merge.mjs --backlog <file> --migrate-types
 
   It rewrites "- [code-churn] x.md — …" into "- [stale-doc] x.md — …" in BOTH sections,
-  drops the leading "../" from targets written when the base was the .kb-gardener
+  drops the leading "../" from targets written when the base was the .garden
   directory rather than the repo root, collapses items that become duplicates, and
   leaves lines it cannot map untouched while reporting them. Non-item lines are
   preserved verbatim.
 
 Exit codes: 0 on success, 1 when a finding carried a rule no table classifies (the
-merge still happened; classify the rule in scripts/rule-types.mjs), 2 on error.
+merge still happened; classify the rule in lib/rule-types.mjs), 2 on error.
 This is a mutation tool, not a detector.
 `;
 
@@ -119,14 +119,14 @@ if (!exists(backlogPath) || !fs.statSync(backlogPath).isFile()) {
 /**
  * The base every item target is relative to.
  *
- * The backlog lives at <repo>/.kb-gardener/backlog.md, but its targets name things in the
+ * The backlog lives at <repo>/.garden/backlog.md, but its targets name things in the
  * repository — `kb/index.md`, `src/auth/` — so the base is the repo root, not the file's own
  * directory. Relativising to the directory produced `../kb/index.md` for every item, which
  * contradicts assets/backlog-template.md and silently broke hand-written `won't do` lines
  * that followed the documented convention.
  */
 const dir = path.dirname(backlogPath);
-const root = path.basename(dir) === '.kb-gardener' ? path.dirname(dir) : dir;
+const root = isStateDir(path.basename(dir)) ? path.dirname(dir) : dir;
 const text = fs.readFileSync(backlogPath, 'utf8');
 const eol = text.includes('\r\n') ? '\r\n' : '\n';
 const lines = text.split(/\r?\n/);
@@ -185,7 +185,7 @@ if (args['migrate-types']) {
     }
     const [, type, rawTarget, description] = m;
     // Targets written before the base was corrected carry one leading "../" from the
-    // .kb-gardener directory. Left alone they never match a finding again.
+    // state directory. Left alone they never match a finding again.
     const target = root !== dir && rawTarget.startsWith('../') ? rawTarget.slice(3) : rawTarget;
     if (target !== rawTarget) rebased.push({ from: rawTarget, to: target });
     let newType = type;
@@ -226,7 +226,7 @@ if (args['migrate-types']) {
     const verb = willWrite ? '' : ' (dry run)';
     process.stdout.write(`${retyped.length} retyped, ${rebased.length} rebased, ${collapsed.length} collapsed, ${untouched.length} left alone${verb}\n`);
     for (const r of retyped) process.stdout.write(`  [${r.from}] -> [${r.to}] ${r.target}\n`);
-    for (const r of rebased) process.stdout.write(`  ${r.from} -> ${r.to} (dropped the .kb-gardener-relative prefix)\n`);
+    for (const r of rebased) process.stdout.write(`  ${r.from} -> ${r.to} (dropped the state-directory-relative prefix)\n`);
     for (const c of collapsed) process.stdout.write(`  collapsed duplicate [${c.type}] ${c.target}\n`);
     for (const u of untouched) process.stdout.write(`  left alone [${u.type}] ${u.target} — ${u.reason}\n`);
   }
@@ -246,7 +246,7 @@ for (const [i, f] of sourceFindings.entries()) {
   const target = f.path;
   const c = classify(rule);
   if (c.kind !== 'mapped') {
-    dropped[c.kind].push({ rule, target, reason: c.reason ?? 'no entry in scripts/rule-types.mjs' });
+    dropped[c.kind].push({ rule, target, reason: c.reason ?? 'no entry in lib/rule-types.mjs' });
     continue;
   }
   findings.push({
@@ -334,7 +334,7 @@ else if (!args.stdout) {
   group('discarded', summary.discarded);
   group('UNCLASSIFIED', summary.unclassified);
   if (summary.unclassified.length) {
-    process.stdout.write('  ^ dropped, not written: add each rule to scripts/rule-types.mjs\n');
+    process.stdout.write('  ^ dropped, not written: add each rule to lib/rule-types.mjs\n');
   }
 
   // Suppressed findings are the expected steady state of a repeat sweep — the backlog

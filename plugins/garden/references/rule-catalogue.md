@@ -20,10 +20,10 @@ Every check that fed a scoring dimension still runs; it now emits a finding reco
 
 ```bash
 # Fail CI on high or critical findings only
-node scripts/doc-audit.mjs /path/to/repo --min-severity high
+node ${CLAUDE_PLUGIN_ROOT}/lib/doc-audit.mjs /path/to/repo --min-severity high
 
 # Reproducible run pinned to a date
-node scripts/doc-audit.mjs /path/to/repo --as-of 2026-08-17 --json
+node ${CLAUDE_PLUGIN_ROOT}/lib/doc-audit.mjs /path/to/repo --as-of 2026-08-17 --json
 ```
 
 ## Drift Categories
@@ -83,7 +83,7 @@ Not all drift can be fixed programmatically. Every finding carries `details.fix_
 
 ## Where this fits
 
-How the analyses fit together lives in `../SKILL.md`. Anti-patterns and prevention patterns live in `drift-prevention.md`.
+How the analyses fit together lives in `../skills/survey/SKILL.md`. Anti-patterns and prevention patterns live in `drift-prevention.md`.
 
 ## Troubleshooting
 

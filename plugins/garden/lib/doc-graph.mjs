@@ -72,7 +72,7 @@ async function validateExternal(url) {
       const res = await fetch(url, {
         method,
         redirect: 'follow',
-        headers: { 'User-Agent': 'kb-gardener' },
+        headers: { 'User-Agent': 'garden' },
         signal: AbortSignal.timeout(10000),
       });
       if (res.status < 400) return null;

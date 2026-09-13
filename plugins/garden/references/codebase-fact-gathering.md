@@ -9,8 +9,8 @@ Read this when you are examining a codebase before writing any onboarding docs â
 Start with the two scripts â€” they cover the mechanical inventory in one pass and work on any platform:
 
 ```
-node scripts/scan.mjs <project> --as-of <YYYY-MM-DD> --json
-node scripts/setup-check.mjs <project> --as-of <YYYY-MM-DD> --json
+node ${CLAUDE_PLUGIN_ROOT}/lib/scan.mjs <project> --as-of <YYYY-MM-DD> --json
+node ${CLAUDE_PLUGIN_ROOT}/lib/setup-check.mjs <project> --as-of <YYYY-MM-DD> --json
 ```
 
 The root is a positional argument (default `.`) and `--as-of` fixes the date the run is reckoned

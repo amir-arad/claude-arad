@@ -2,7 +2,7 @@
 
 **Run root:** {{root}}
 **As of:** {{as_of}}
-**Tools:** `doc-audit.mjs`, `doc-graph.mjs` (doc-drift-detector {{skill_version}})
+**Tools:** `doc-audit.mjs`, `doc-graph.mjs` (garden {{skill_version}})
 
 Every number below comes from the `summary` block of a tool envelope (`references/contract.md` §2). There is no aggregate score — if a reader asks "what is our doc health out of 100", the answer is the histogram plus the worst offenders.
 
@@ -11,8 +11,8 @@ Every number below comes from the `summary` block of a tool envelope (`reference
 ## What was run
 
 ```bash
-node scripts/doc-audit.mjs {{root}} --as-of {{as_of}} --json
-node scripts/doc-graph.mjs {{root}} --as-of {{as_of}} --json
+node ${CLAUDE_PLUGIN_ROOT}/lib/doc-audit.mjs {{root}} --as-of {{as_of}} --json
+node ${CLAUDE_PLUGIN_ROOT}/lib/doc-graph.mjs {{root}} --as-of {{as_of}} --json
 ```
 
 Gate: `--min-severity {{gate}}`. Exit codes: {{doc_audit_exit}} (doc-audit), {{doc_graph_exit}} (doc-graph).
@@ -100,4 +100,4 @@ Record these so the next run does not re-litigate them.
 
 ---
 
-*Generated with [doc-drift-detector](../SKILL.md)*
+*Generated with `/garden:survey`*
