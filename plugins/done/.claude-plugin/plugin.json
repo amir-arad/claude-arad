@@ -1,0 +1,10 @@
+{
+  "name": "done",
+  "version": "0.1.0",
+  "description": "Solo project management for any complex backlog or goal: init, what-now, goals. Facts by script, judgment by model.",
+  "author": {
+    "name": "Amir Arad",
+    "email": "greenshade@gmail.com"
+  },
+  "keywords": ["planning", "backlog", "solo", "routing", "agents"]
+}
