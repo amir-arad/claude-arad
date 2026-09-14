@@ -3,5 +3,6 @@
   "plugins/garden": "3.0.0",
   "plugins/likec4": "0.2.0",
   "plugins/context": "0.1.0",
-  "plugins/other-models": "0.2.0"
+  "plugins/other-models": "0.2.0",
+  "plugins/done": "0.1.0"
 }
