@@ -1,6 +1,6 @@
 {
   "name": "other-models",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Call another model harness (Gemini via Antigravity agy, OpenAI Codex) headlessly: prompt in, bare answer out.",
   "author": {
     "name": "Amir Arad",
