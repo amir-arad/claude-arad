@@ -77,6 +77,19 @@
         "dsl",
         "upstream"
       ]
+    },
+    {
+      "name": "other-models",
+      "source": "./plugins/other-models",
+      "description": "Call another model harness (Gemini via Antigravity agy, OpenAI Codex) headlessly: prompt in, bare answer out.",
+      "version": "0.1.0",
+      "keywords": [
+        "gemini",
+        "codex",
+        "agy",
+        "second-model",
+        "cross-model"
+      ]
     }
   ]
 }
