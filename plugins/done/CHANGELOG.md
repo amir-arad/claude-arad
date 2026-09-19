@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1](https://github.com/amir-arad/claude-arad/compare/done-v0.4.0...done-v0.4.1) (2026-09-19)
+
+
+### Bug Fixes
+
+* **done:** sync bugs from the Cowork e2e run; rename skills to *-done ([#16](https://github.com/amir-arad/claude-arad/issues/16)) ([1a158ed](https://github.com/amir-arad/claude-arad/commit/1a158ede2f68389b51856f266f9be77f4fe5ba69))
+
 ## [0.4.0](https://github.com/amir-arad/claude-arad/compare/done-v0.3.0...done-v0.4.0) (2026-09-19)
 
 
