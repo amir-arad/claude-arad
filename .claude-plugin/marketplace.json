@@ -95,7 +95,7 @@
       "name": "done",
       "source": "./plugins/done",
       "description": "Solo project management for any complex backlog or goal: init, what-now, goals. Facts by script, judgment by model.",
-      "version": "0.3.0",
+      "version": "0.4.0",
       "keywords": [
         "planning",
         "backlog",
