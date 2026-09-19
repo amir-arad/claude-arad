@@ -30,6 +30,12 @@ node scripts/generate-release-config.js
 
 Expected stdout (from the script's `console.log` calls): `Discovered N plugin(s) in plugins/`, optional `Updated <name>: <fields>` / `Added new plugin: <name>`, then `Generated release-please-config.json with N package(s)` and `Updated .release-please-manifest.json`.
 
+A new plugin on the branch changes all three files. Observed 2026-09-14 (`done`): a `done` entry in `marketplace.json`, a `plugins/done` component in `release-please-config.json`, and a changed manifest. CI owns them (`CLAUDE.md`), so revert before committing:
+
+```bash
+git checkout -- .claude-plugin/marketplace.json release-please-config.json .release-please-manifest.json
+```
+
 **3. Install the marketplace into Claude Code**
 
 From `README.md`:

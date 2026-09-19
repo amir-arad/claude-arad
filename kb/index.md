@@ -15,10 +15,15 @@ Hub for `claude-arad`. One entry per doc; link text carries a word from the doc'
 
 - [Runbooks: known failures and how plugins find their own files](runbooks.md) — Release PR not opening, silent skip on name mismatch, 403, squash-merge, and the Cowork sandbox findings (`${CLAUDE_SKILL_DIR}` empty, plugin mount path, outputs delete restriction).
 
+## Work in progress
+
+- [Done plugin: where the work stands](done-plugin-status.md) — the `done` solo-project plugin: spec and plan paths, user decisions, PRs and releases so far, Cowork smoke results, proposed changes and open questions.
+
 ## Observed environments
 
+- [Cross-harness plugins: writing skills that work in both Claude Code and Cowork](cross-harness-plugins.md) — distribution, where plugin files live, placeholder substitution, scripts, writable locations, smoke-test recipe.
 - [Cowork sandbox environment facts](cowork-sandbox-environment.md) — probe of the Cowork Linux sandbox: shell, tools, proxy, `~/mnt` folders and their write permissions, plugin location on disk, cowork tools.
-- [Skill placeholders `${CLAUDE_SKILL_DIR}` and `${CLAUDE_PLUGIN_ROOT}` unset in Cowork](skill-placeholders-unset-in-cowork.md) — what `done:init` saw, the system-prompt wording on substitution, where the plugin actually was.
+- [Skill placeholders `${CLAUDE_SKILL_DIR}` and `${CLAUDE_PLUGIN_ROOT}` in Cowork](skill-placeholders-unset-in-cowork.md) — smoke v1 (shell variable, empty) vs v2 (substituted to the Windows host path), the system-prompt wording, where the plugin actually was.
 
 ## Reference
 
