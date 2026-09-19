@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// Documented in kb/deployment.md
 
 /**
  * Syncs marketplace.json and generates release-please configuration.
