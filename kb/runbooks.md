@@ -37,7 +37,7 @@ Source: documented — `CLAUDE.md`.
 
 Cause: in Cowork the placeholders are not environment variables and were not substituted for a `/plugin:skill` invocation.
 Fallback: the plugin tree is at `~/mnt/.remote-plugins/plugin_<id>/`, read-only; the id matches the Windows base-directory path in the skill header.
-Full record: [skill placeholders unset in Cowork](skill-placeholders-unset-in-cowork.md).
+Full record: [skill placeholders unset in Cowork](skill-placeholders-unset-in-cowork.md). A second run did substitute them. Practice for both harnesses: [cross-harness plugins](cross-harness-plugins.md).
 Source: observed 2026-09-19 — `done:init` smoke.
 
 ## Cowork sandbox facts a plugin script may depend on

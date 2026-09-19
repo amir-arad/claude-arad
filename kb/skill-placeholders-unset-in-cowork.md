@@ -28,6 +28,10 @@ The `/done:init` invocation arrived as a `<command-name>` block with the skill b
 
 `~/mnt/.remote-plugins/plugin_01Rkn9mi36M72QHEcZWLSkZX/` — read-only, containing `.claude-plugin/plugin.json` (name `done`, 0.2.0), `skills/init/SKILL.md`, `CHANGELOG.md`, no `lib/`. The id in the sandbox path equals the id in the Windows header path. Details in [Cowork sandbox environment](cowork-sandbox-environment.md).
 
+## Second run (smoke v2, same day)
+
+A later `/init` run in Cowork substituted both placeholders to the Windows host path (`C:/Users/green/AppData/Roaming/Claude/local-agent-mode-sessions/.../rpm/plugin_01Rkn9mi36M72QHEcZWLSkZX/skills/init`), and `ls` through them succeeded against `/sessions/practical-great-bell/mnt/.remote-plugins/plugin_01Rkn9mi36M72QHEcZWLSkZX/...`. Why the two runs differ, and what translated the path, is unknown. See [cross-harness plugins](cross-harness-plugins.md).
+
 ## Limits
 
 One plugin, one session, Cowork only. Not tested: whether invoking via the Skill tool (rather than `/plugin:skill` slash form) substitutes the placeholders in Cowork; whether Claude Code CLI behaves the same.
