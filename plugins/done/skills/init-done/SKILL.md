@@ -1,5 +1,5 @@
 ---
-name: init
+name: init-done
 description: Create .done/ at the project root and fill project.md through a short interview. Idempotent; never overwrites. Optionally converts an existing plan file into the card grammar.
 argument-hint: "[root] [--from <legacy plan path>]"
 disable-model-invocation: true
@@ -63,4 +63,4 @@ Manual: check each row against the grammar by hand, write plan.md directly, and 
 
 ## 4. Report
 
-Root, files created / present, the project.md block as written, cards converted (count) and rows dropped. `.done/work/` holds scratch files; suggest adding it to `.gitignore`. End with: `Run /done:what-now`. Nothing is committed.
+Root, files created / present, the project.md block as written, cards converted (count) and rows dropped. `.done/work/` holds scratch files; suggest adding it to `.gitignore`. End with: `Run /done:what-now-done`. Nothing is committed.

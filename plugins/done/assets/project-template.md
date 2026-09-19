@@ -4,7 +4,7 @@ sync: git | github | self-report.  capacity: agents | people | none.
 sync.repo and sync.labels.* are used only when sync is github.
 thresholds.* and gates.* override strategies/<strategy>/ladder.md and modes.md defaults.
 never: comma-separated paths or surfaces the model must not edit.
-Edited by /done:init and by hand. Never by what-now or goals.
+Edited by /done:init-done and by hand. Never by what-now or goals.
 -->
 # Project
 
@@ -28,4 +28,4 @@ never:
 
 ## Goal
 
-One sentence. Edited only by /done:goals or the user.
+One sentence. Edited only by /done:goals-done or the user.

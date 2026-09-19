@@ -1,4 +1,5 @@
 import { test } from 'node:test';
+import fs from 'node:fs'; import os from 'node:os';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import path from 'node:path'; import { fileURLToPath } from 'node:url';
@@ -24,4 +25,16 @@ test('CLI reads this repository', () => {
   const out = JSON.parse(execFileSync(process.execPath, [path.join(here, '..', 'lib', 'sync-git.mjs'), path.join(here, '..', '..', '..'), '--since', '2000-01-01'], { encoding: 'utf8' }));
   assert.equal(out.source, 'git');
   assert.ok(out.commits.length > 0);
+});
+
+test('CLI --since includes commits made earlier the same day', () => {
+  const here = path.dirname(fileURLToPath(import.meta.url));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'done-git-'));
+  const g = (...a) => execFileSync('git', ['-C', dir, ...a], { encoding: 'utf8' });
+  g('init', '-q');
+  const today = new Date().toISOString().slice(0, 10);
+  execFileSync('git', ['-C', dir, '-c', 'user.name=t', '-c', 'user.email=t@t', 'commit', '-q', '--allow-empty', '-m', 'seed (#1)'],
+    { env: { ...process.env, GIT_AUTHOR_DATE: `${today}T00:00:05Z`, GIT_COMMITTER_DATE: `${today}T00:00:05Z` } });
+  const out = JSON.parse(execFileSync(process.execPath, [path.join(here, '..', 'lib', 'sync-git.mjs'), dir, '--since', today], { encoding: 'utf8' }));
+  assert.equal(out.commits.length, 1);
 });

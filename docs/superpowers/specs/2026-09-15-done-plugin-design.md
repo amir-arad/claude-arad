@@ -9,9 +9,9 @@ any complex backlog or goal, optional delegates (agents or people).
 ## 1. Goals and non-goals
 
 Goals:
-- `/done:what-now` — sync facts, update state, route one next card, prepare it.
-- `/done:goals` — replan: evidence sweep → gap analysis → milestones → cards.
-- `/done:init` — scaffold + interview → per-project config.
+- `/done:what-now-done` — sync facts, update state, route one next card, prepare it.
+- `/done:goals-done` — replan: evidence sweep → gap analysis → milestones → cards.
+- `/done:init-done` — scaffold + interview → per-project config.
 - Strategies are pluggable folders (ladder + modes + failure checks). v1 ships one: `agent-fleet`.
 - Facts by script, judgment by model. Everything the playbook drifted on is derived, not hand-kept.
 - Works in Claude Code and Cowork.
@@ -45,9 +45,9 @@ Non-goals (v1):
 ```
 plugins/done/
   .claude-plugin/plugin.json
-  skills/init/SKILL.md
-  skills/what-now/SKILL.md
-  skills/goals/SKILL.md
+  skills/init-done/SKILL.md
+  skills/what-now-done/SKILL.md
+  skills/goals-done/SKILL.md
   strategies/agent-fleet/ladder.md          precedence rules, thresholds referenced by name
   strategies/agent-fleet/modes.md           mode defaults: who prepares, who gates, done-when
   strategies/agent-fleet/failure-checks.md  checklist run before dispatch / after sync

@@ -1,5 +1,5 @@
 ---
-name: what-now
+name: what-now-done
 description: Route the next unit of work. Syncs facts from git (and GitHub when configured), updates .done/ state, applies the strategy ladder, and returns exactly one card with its first action prepared. Records scope moves made mid-run as owner-call decisions.
 argument-hint: "[what changed, or a constraint for this run]"
 disable-model-invocation: true
@@ -13,9 +13,9 @@ Every *script* step has a *manual* alternative for when `node` is absent or the 
 
 ## 0. Project root → `ROOT`
 
-- Cowork (`~/mnt/` exists): `ls -a ~/mnt`. Candidates are entries other than `outputs`, `uploads` and dot-dirs. Keep those that contain `.done/`. One → `ROOT`. Several → ask which. None with `.done/` → say `Run /done:init` and stop.
+- Cowork (`~/mnt/` exists): `ls -a ~/mnt`. Candidates are entries other than `outputs`, `uploads` and dot-dirs. Keep those that contain `.done/`. One → `ROOT`. Several → ask which. None with `.done/` → say `Run /done:init-done` and stop.
 - Otherwise: `git rev-parse --show-toplevel`, else the current directory.
-- `ROOT/.done/` missing → say `Run /done:init` and stop.
+- `ROOT/.done/` missing → say `Run /done:init-done` and stop.
 
 Scratch files go in `ROOT/.done/work/` (create it; overwrite files there, never delete them).
 
@@ -45,6 +45,7 @@ b. **GitHub** — only when project.md has `sync: github`. First match wins:
    ```
    node ${CLAUDE_SKILL_DIR}/../../lib/sync-github.mjs --from-dir "ROOT/.done/work" --repo <sync.repo> --ready-label <..> --in-progress-label <..> --since SINCE > "ROOT/.done/work/github.json"
    ```
+   Save all three files on every run, even when you expect no change. Never reuse files from an earlier run. Exit 3 means a file is stale: save it again, then rerun once.
    Name the connector tools you used in the Deltas output (`sync: connector <tool names>`).
 3. Neither works → git facts only; say `sync: no GitHub access, git only` in Deltas.
 

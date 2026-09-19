@@ -22,11 +22,12 @@ One paid Cowork session. It covers the real skills plus three questions still op
 | # | User types | Expected | Probes |
 |---|---|---|---|
 | 1 | `what should I work on next? use the done plugin's what-now` | The model cannot invoke the skill (disable-model-invocation). Record exactly what it says or does | open question 3 |
-| 2 | `/done:init` | Lists both folders, asks which one → answer A. Scaffolds `A/.done/` | open question 2, root rule |
+| 2 | `/done:init-done` | Lists both folders, asks which one → answer A. Scaffolds `A/.done/` | open question 2, root rule |
 | 3 | Interview answers: name `e2e`; GitHub `amir-arad/claude-arad`; labels `agent-ready` / `agent-in-progress`; capacity `agents`; max 2; never: none | project.md filled, `sync: github` | init interview |
-| 4 | `/done:what-now` | Asks which folder only if both have `.done/` (they should not → no question). Git sync, then connector sync: saves `A/.done/work/{merged,open,issues}.json`, runs `sync-github --from-dir`, names the connector tools. Routes the template's example card M1.1 (DECIDE, rule 3) | open question 1 |
-| 5 | `/done:goals replace the example with milestone M1: one DO card "write README" and one DECIDE card "pick license" that blocks it` | Confirmation gate, then plan.md version bumped, log line | goals, guarded write |
-| 6 | `/done:what-now` | Routes "pick license" (rule 3), state.md version bumped again | derive + ladder |
+| 4 | `/done:what-now-done` | Asks which folder only if both have `.done/` (they should not → no question). Git sync, then connector sync: saves `A/.done/work/{merged,open,issues}.json`, runs `sync-github --from-dir`, names the connector tools. Routes the template's example card M1.1 (DECIDE, rule 3) | open question 1 |
+| 5 | `/done:goals-done replace the example with milestone M1: one DO card "write README" and one DECIDE card "pick license" that blocks it` | Confirmation gate, then plan.md version bumped, log line | goals, guarded write |
+| 6 | `/done:what-now-done` | Routes "pick license" (rule 3), state.md version bumped again | derive + ladder |
+| 7 | bare `/init` (no namespace) | Record what the picker offers and what runs | skill-name collision (pinned in done-plugin-status.md) |
 
 ## After the run
 
