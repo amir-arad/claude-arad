@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs'; import path from 'node:path';
 import { parseArgs, fail, emit, readText, readVersion, isMain, todayIso, writeAtomic } from './lib.mjs';
-import { parsePlan } from './cards.mjs';
+import { parsePlan, CELL_SPLIT } from './cards.mjs';
 import { appendLog } from './log-append.mjs';
 export function guardedWrite({ file, expectVersion, content, root, date }) {
   const current = readText(file);
@@ -25,7 +25,7 @@ export function guardedWrite({ file, expectVersion, content, root, date }) {
     const fix = new Set(plan.milestones.flatMap((m) => m.cards).filter((c) => c.blockedOn.some((b) => b.kind === 'card' && gone.has(b.ref))).map((c) => c.line - 1));
     body = body.split(/\r?\n/).map((l, i) => {
       if (!fix.has(i)) return l;
-      const c = l.split('|');  // ['', Card, Action, Mode, Owner, Blocked on, Status, '']
+      const c = l.split(CELL_SPLIT);  // ['', Card, Action, Mode, Owner, Blocked on, Status, '']
       c[5] = ' ' + c[5].split(',').map((s) => s.trim()).filter((s) => s && !gone.has(s)).join(', ') + ' ';
       return c.join('|');
     }).filter((_, i) => !drop.has(i)).join('\n');

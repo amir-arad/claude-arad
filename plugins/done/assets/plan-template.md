@@ -3,7 +3,7 @@
 Milestones: `## <ID> — <title>` in priority order. ID = letters+digits, e.g. M1.
 Cards: one table row per card under a milestone, columns exactly:
 | Card | Action | Mode | Owner | Blocked on | Status |
-Card: `<milestone>.<n>` unique (M1.2), never reused: not from the cut list, not from cards archived in log.md. Action: free text, one line.
+Card: `<milestone>.<n>` unique (M1.2), never reused: not from the cut list, not from cards archived in log.md. Action: free text, one line; write a literal pipe as `\|`.
 Mode: DECIDE | DISPATCH | REVIEW | QA | DO, optional suffix `(gate: <who>)`.
 Owner: empty = the project owner; else a name.
 Blocked on: comma list of card ids, `ext:<text>`, `owner:<name>`. Nothing else.

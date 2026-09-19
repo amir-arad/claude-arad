@@ -36,7 +36,7 @@ Strictly ordered. Each: id, title, one `Exit:` line. Rows inside a milestone are
 
 ## 4. Cards
 
-In the grammar at the top of `ASSETS/plan-template.md`. Every DISPATCH names an issue (`filed #N`) or states in its Action that one must be filed; every DECIDE names in its Action who consumes the ruling. Cuts go to `## Cut list` with a reason, never silently dropped; a cut card line starts with its id. New cards take the next unused number: never an id in the cut list or in a log.md `archive card:` line.
+In the grammar at the top of `ASSETS/plan-template.md`. Every DISPATCH names an issue (`filed #N`) or states in its Action that one must be filed; every DECIDE names in its Action who consumes the ruling. Cuts go to `## Cut list` with a reason, never silently dropped; a cut card line starts with its id. New cards take the next unused number: never an id in the cut list or in a log.md `archive card:` line. Exception: the template's example row (Action `Replace me`) is deleted, not cut, so its id stays free.
 Reconcile every `[owner-call]` line in decisions.md dated after the last `goals` log line: each becomes a card, a cut-list line, or is superseded (say which).
 Reversal → append `- <date> — <what> — reversed: <old> → <new> — by <owner>` to decisions.md.
 

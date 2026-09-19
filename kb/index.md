@@ -19,6 +19,7 @@ Hub for `claude-arad`. One entry per doc; link text carries a word from the doc'
 
 - [Done plugin: Cowork end-to-end protocol](done-cowork-e2e.md) — plan Task 13: one Cowork session that runs init, what-now, goals and probes the connector output shape, several selected folders and non-slash invocation.
 - [Done plugin: Cowork e2e results](done-cowork-e2e-results.md) — Task 13 run on 0.4.0: connector output shape (REST, string labels, no approval prompt), several folders, invocation without the slash command, picker name collision, sync bugs fixed.
+- [Done plugin: second Cowork run](done-cowork-e2e-2.md) — protocol for 0.4.3: renamed commands, same-day what-now, stale raw files, card id check on an invalid plan, two `.done/` folders, self-report, capacity none, `\|` in a cell, template card deletion.
 - [Done plugin: where the work stands](done-plugin-status.md) — the `done` solo-project plugin: spec and plan paths, user decisions, PRs and releases so far, Cowork smoke results, proposed changes and open questions.
 
 ## Observed environments
