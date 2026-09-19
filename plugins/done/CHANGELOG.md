@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.2](https://github.com/amir-arad/claude-arad/compare/done-v0.2.1...done-v0.2.2) (2026-09-19)
+
+
+### Bug Fixes
+
+* **done:** smoke v3 init and KB notes on done status and cross-harness plugins ([#9](https://github.com/amir-arad/claude-arad/issues/9)) ([a5ebf2d](https://github.com/amir-arad/claude-arad/commit/a5ebf2d3564fc3e0fe461f8be027a1ad987f4ca3))
+
 ## [0.2.1](https://github.com/amir-arad/claude-arad/compare/done-v0.2.0...done-v0.2.1) (2026-09-19)
 
 
