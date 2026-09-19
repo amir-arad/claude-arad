@@ -41,7 +41,7 @@ One run, one Windows host, session `beautiful-loving-galileo`, selected folder `
 | delete after `mcp__cowork__allow_cowork_file_delete` | ok | ok | ok |
 
 - Grant message: `File deletion is now enabled for the "claude-arad" folder.`
-- Not tested: overwriting an existing file, `rename` (atomic write), `mkdir` of an existing dir, and whether the grant lasts beyond the session.
+- The follow-up run below covers overwrite, rename and whether the grant lasts.
 
 ## Git
 
@@ -65,3 +65,29 @@ The same as [Cowork sandbox environment](cowork-sandbox-environment.md): node v2
 - Scripts take the project dir as an explicit argument.
 - State files must avoid delete and rename, or `init` must call `allow_cowork_file_delete` first. Overwriting is untested.
 - Remote sync: detect the connector by tool function (`list_pull_requests`, `get_me`), not by `github` in the name. Local git works for reads. Fetch does not.
+
+## Follow-up: a fresh session (`modest-trusting-lamport`), 2026-09-19
+
+Script written by Cowork Fable 5.1. `P=~/mnt/claude-arad`. The pre-grant steps ran before any permission call.
+
+| Step | Result |
+|---|---|
+| `printf %s "C:\Workspace\claude-arad" \| od -c` | bytes `C : \ W o r k s p a c e ...`. Bash received the Windows string unchanged |
+| `printf %s "$P" \| od -c` | `/sessions/<name>/mnt/claude-arad` |
+| `rm` before the grant | `rm: cannot remove 'C:\Workspace\claude-arad\.t1': Operation not permitted` |
+| overwrite (`>`) before the grant | ok |
+| `mv` over an existing file, before the grant | ok |
+| `mv` to a new name, before the grant | ok |
+| node `fs.renameSync` over an existing file, before the grant | ok |
+| `allow_cowork_file_delete`, then `rm` | ok |
+| `ls -d "C:\Workspace\claude-arad"`, `ls -d "C:/Workspace/claude-arad"` | `No such file or directory` (both) |
+
+Findings:
+- **The delete grant is per session.** A new session is denied `rm` again.
+- **Only unlink is blocked.** Create, overwrite, truncate and rename (including rename over an existing file) work without the grant, so atomic write via temp file plus rename works.
+- **The folder's Windows path does not resolve in bash.** Commands must use `~/mnt/<name>`.
+- **The output rewrites folder paths:** the `rm` error printed the Windows path although the command used the sandbox path. Plugin-path input is rewritten (A3–A7), so the placeholder paths work. Folder-path input is not (step 1, step 8).
+
+Consequences for `done`:
+- Scripts and commands use `~/mnt/<name>`, never the Windows path.
+- State writes use overwrite or rename and never delete. Then no grant is needed. If a delete is ever required, call `allow_cowork_file_delete` once per session.

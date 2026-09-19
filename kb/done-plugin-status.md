@@ -62,12 +62,12 @@ Implementation details, settled by testing rather than approval:
 Results: [Cowork smoke v3 results](cowork-smoke-v3-results.md). In short:
 - Placeholder paths work for the shell, `node` and the Read tool. No rebuild fallback is needed.
 - The folder is at `~/mnt/<name>`, and cwd is the session home.
-- Shell, `node` and Write-tool writes work.
-- Deletes need `mcp__cowork__allow_cowork_file_delete` first.
+- Shell, `node` and Write-tool writes work, and so do overwrite and rename, even before the grant.
+- Deletes need `mcp__cowork__allow_cowork_file_delete`, once per session.
 - Git reads work. `fetch` and HTTPS to GitHub are blocked.
 - The GitHub connector works, but its tool names have no `github` in them.
 
-Still untested: overwriting files, `rename`, and whether the delete grant persists across sessions.
+Also: bash cannot resolve the folder's Windows path, so use `~/mnt/<name>`. Output converts folder paths back to Windows paths.
 
 ## Design evidence sources
 

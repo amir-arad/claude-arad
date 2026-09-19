@@ -66,7 +66,7 @@ Evidence base: docs, plus one run each of two smoke tests of `done` in Cowork, o
 | `~/mnt/outputs/` | create ok, `rm` denied |
 | `~/mnt/uploads/` | read-only |
 | plugin tree | read-only |
-| user-selected folder (`mcp__cowork__request_cowork_directory`) | create ok for shell, node, Write. Delete denied until `mcp__cowork__allow_cowork_file_delete` (smoke v3) |
+| user-selected folder (`mcp__cowork__request_cowork_directory`) | create, overwrite and rename ok for shell, node and Write. Delete denied until `mcp__cowork__allow_cowork_file_delete`, per session. Use `~/mnt/<name>`; the Windows path fails in bash |
 
 Per-project state belongs in a user-selected folder.
 
