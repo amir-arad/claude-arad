@@ -41,8 +41,8 @@ A second session (claude-arad-c1) reviewed the design. Its accepted points are i
 | Smoke v1 in Cowork | read the shell variable only, so no substitution result. `node` v22.23.2, `gh` absent, git 2.34.1 |
 | PR #7, smoke v2 | merged, together with KB commit `801ac68` |
 | Smoke v2 in Cowork | placeholders substituted to the Windows host path, `ls` through both succeeded. See [skill placeholders in Cowork](skill-placeholders-unset-in-cowork.md) |
-| PR #9, KB notes | open |
-| Smoke v3 | in PR #9, awaiting a Cowork run |
+| PR #9, KB notes + smoke v3 | merged |
+| Smoke v3 | PR #9 merged, released 0.2.2, ran in Cowork |
 | Tasks 2–13 | not started |
 
 ## Decisions after smoke v2 (2026-09-19)
@@ -54,18 +54,21 @@ User decisions:
 - **Paid tests:** each Cowork run costs the user, so every smoke run must probe everything still open.
 
 Implementation details, settled by testing rather than approval:
-- Paths: `${CLAUDE_SKILL_DIR}/../../<dir>/...`. Smoke v2 showed `ls` through the host path works. `node <path>` and the Read tool are tested in smoke v3.
-- Writes: shell, node and the Write tool into the selected folder are tested in smoke v3. Fallback if shell fails: the Write tool.
+- Paths: `${CLAUDE_SKILL_DIR}/../../<dir>/...` works for the shell, `node` and the Read tool (smoke v3).
+- Writes: shell, node and the Write tool all work in the folder. Deletes need the Cowork delete grant (smoke v3).
 
-## Smoke v3 (PR #9, not yet run)
+## Smoke v3 (ran 2026-09-19, done 0.2.2)
 
-`plugins/done/skills/init/SKILL.md` plus `plugins/done/lib/smoke.mjs`. Checks:
-- A: placeholder text, `ls`/`head`/Read tool/`node` through the placeholder path, invocation route.
-- B: finding the selected folder under `~/mnt`, owner, mount line. cwd is the session home, not the folder (smoke v2).
-- C: shell, node and Write-tool write and delete in the folder, plus leftovers.
-- D: git repo, log, status, remote, `fetch`, stranded `.git/*.lock`.
-- E: `gh`, HTTPS to api.github.com, GitHub connector tool names, one read-only connector call.
-- F: tool versions, env, identity, cowork tool names.
+Results: [Cowork smoke v3 results](cowork-smoke-v3-results.md). In short:
+- Placeholder paths work for the shell, `node` and the Read tool. No rebuild fallback is needed.
+- The folder is at `~/mnt/<name>`, and cwd is the session home.
+- Shell, `node` and Write-tool writes work.
+- Deletes need `mcp__cowork__allow_cowork_file_delete` first.
+- Git reads work. `fetch` and HTTPS to GitHub are blocked.
+- The GitHub connector works, but its tool names have no `github` in them.
+
+Still untested: overwriting files, `rename`, and whether the delete grant persists across sessions.
+
 ## Design evidence sources
 
 - `C:/Workspace/helios/starwards-design/.claude/skills/starwards-what-now/SKILL.md`: one commit, 2026-08-02.
