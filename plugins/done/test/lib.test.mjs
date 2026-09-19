@@ -22,12 +22,15 @@ test('parseProject reads the config block', () => {
   const text = `<!-- FORMAT CONTRACT -->\n# Project\n\n\`\`\`\nname: demo\nroot: .\nstrategy: agent-fleet\nsync: github\nsync.repo: o/r\nsync.labels.ready: agent-ready\nsync.labels.in_progress: agent-in-progress\ncapacity: agents\nthresholds.max_in_flight: 3\ngates.dispatch: human\nnever: roadmap.md, docs/adr/\n\`\`\`\n`;
   const p = parseProject(text);
   assert.equal(p.name, 'demo');
+  assert.equal(p.strategy, 'agent-fleet');
   assert.equal(p.sync.kind, 'github');
   assert.equal(p.sync.repo, 'o/r');
-  assert.equal(p.sync.labels.ready, 'agent-ready');
-  assert.equal(p.thresholds.max_in_flight, 3);
-  assert.equal(p.gates.dispatch, 'human');
   assert.deepEqual(p.never, ['roadmap.md', 'docs/adr/']);
+  // keys from before 0.5 (dispatch, capacity) are kept as extra, not rejected
+  assert.equal(p.extra['sync.labels.ready'], 'agent-ready');
+  assert.equal(p.extra['thresholds.max_in_flight'], 3);
+  assert.equal(p.extra.capacity, 'agents');
+  assert.equal(parseProject('```\nname: x\n```').strategy, 'value-ladder');
 });
 
 test('parseProject defaults sync to git', () => {

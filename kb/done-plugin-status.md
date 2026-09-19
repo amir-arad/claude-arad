@@ -157,3 +157,31 @@ Headless `claude -p "/done:what-now-done" --plugin-dir plugins/done` in a temp g
 - `capacity: none` caused no error. Nothing in that run depended on it.
 
 The next Cowork run is designed in [done-cowork-e2e-2.md](done-cowork-e2e-2.md).
+
+## Scope cut to one person: value-ladder (feat/done-value-ladder, 2026-09-19)
+
+User decision: the plugin decides what is the most valuable next thing for **one person**. How work gets done is outside the decision logic: by hand, by the session running the skill (once the user says go), or handed off to some other dispatch setup. The plugin sees only the facts that come back through sync (issue filed, PR open, merged). Other work capacity (people, automations, agents) comes later as a separate skill in this plugin, which adds project.md keys and a strategy that reads them.
+- Why now: the user will not run a dispatch setup for weeks and will not replace the starwards skill until done is proven. So the agent-fleet parts had no user and only added settings and failure modes. This reverses my earlier advice, which was to defer the cut until M2; that advice assumed M2 would run on starwards's label setup.
+- User choices: strategy name `value-ladder`; REVIEW mode kept (your own open PRs come first).
+- Removed:
+  - the DISPATCH mode and the `dispatched #N` status
+  - init questions 3–5 (labels, capacity, max in flight)
+  - the project.md keys `capacity`, `sync.labels.*`, `thresholds.*`, `gates.*`
+  - in counts: `dispatch_gap`, `in_flight`, the stale-label and label-without-worker blockers
+  - in sync-github: label classification (`readyNoPr`, `inProgress`, `staleLabels`) and the `--ready-label` / `--in-progress-label` options
+  - the "Before dispatch" checklist
+- Added:
+  - `derive.unblocks`: for each ready card, how many cards are transitively blocked on it. Rule 3 routes QA/DO by it (previously plan order).
+  - `counts.ready_review`: previously a ready REVIEW card matched no rule.
+  - `facts.issues`: open issues with plain label names.
+- Ladder: 0 blocker → 1 finished work waiting on you (`pr #N` or a ready REVIEW) → 2 DECIDE → 3 QA/DO by unblocks → 4 nothing routable.
+- Old projects:
+  - project.md keys from before 0.5 are kept in `extra` and ignored.
+  - what-now falls back to value-ladder when `strategies/<name>` is missing.
+  - A plan with DISPATCH or `dispatched #N` fails validation, so what-now stops with "run goals reconcile". goals converts DISPATCH → DO and `dispatched #N` → `filed #N`.
+- Evidence: 33 tests pass. A headless `claude -p "/done:what-now-done" --plugin-dir <worktree>/plugins/done` ran in a temp repo with a card at `pr #3`, a commit `feat: start (#3)`, a DECIDE card whose Action contains `\|`, and two DO cards:
+  - M1.1 was marked done and archived.
+  - The run routed DECIDE M1.2 with `rule:2` ("unblocks M1.3").
+  - The `\|` survived state-write.
+  - The log line was `what-now v2 rule:2 card:M1.2`.
+- Not checked: the goals conversion of a pre-0.5 plan, and the strategy fallback. Both are in the Cowork protocol.

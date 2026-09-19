@@ -7,23 +7,18 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const plan = parsePlan(fs.readFileSync(path.join(here, 'fixtures', 'plan-valid.md'), 'utf8'));
 
 test('counts without facts', () => {
-  const c = counts({ derived: derive(plan), plan, facts: null, project: { thresholds: { max_in_flight: 3 } } });
-  assert.equal(c.in_flight, 2);
-  assert.equal(c.awaiting_gate, 1);
-  assert.equal(c.ready_decide, 1);
-  assert.equal(c.dispatch_gap, 1);
-  assert.deepEqual(c.blockers, []);
+  const c = counts({ derived: derive(plan), plan, facts: null });
+  assert.deepEqual(c, { awaiting_gate: 1, ready_review: 0, ready_decide: 1, ready_qa: 0, ready_do: 0, blockers: [] });
 });
 
 test('counts surfaces fact blockers', () => {
-  const facts = { duplicateClaims: [{ issue: 2131, prs: [1, 2] }], staleLabels: [{ number: 9, label: 'agent-in-progress', updatedAt: '2026-09-01' }], readyNoPr: [], errors: [] };
-  const c = counts({ derived: derive(plan), plan, facts, project: { thresholds: {} } });
-  assert.equal(c.blockers.length, 2);
-  assert.equal(c.max_in_flight, 2);   // default when threshold absent
+  const facts = { duplicateClaims: [{ issue: 2131, prs: [1, 2] }], errors: ['boom'] };
+  const c = counts({ derived: derive(plan), plan, facts });
+  assert.deepEqual(c.blockers, ['duplicate claim: issue #2131 has PRs #1, #2', 'sync error: boom']);
 });
 
 test('counts accepts git facts without blockers', () => {
   const facts = { source: 'git', commits: [{ sha: 'a', date: '2026-09-14', subject: 'x', refs: [] }], errors: [] };
-  const c = counts({ derived: derive(plan), plan, facts, project: { thresholds: {} } });
+  const c = counts({ derived: derive(plan), plan, facts });
   assert.deepEqual(c.blockers, []);
 });
