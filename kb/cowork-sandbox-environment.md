@@ -18,7 +18,7 @@ What the Cowork (Claude desktop) Linux sandbox looked like when probed on 2026-0
 - `SHELL=/bin/sh`, `LANG=C.UTF-8`, `TZ=Europe/Berlin`, `SANDBOX_RUNTIME=1`.
 - `TMPDIR`, `CLAUDE_TMPDIR`, `CLAUDE_CODE_TMPDIR` all `= $HOME/tmp`; `node -e os.tmpdir()` → same; `process.platform` → `linux`.
 - All network egress via authenticated proxy on localhost: `HTTP_PROXY`/`HTTPS_PROXY`/`ALL_PROXY`/`GRPC_PROXY`/`FTP_PROXY` (socks5h), `GIT_SSH_COMMAND` with a socat `PROXY:` ProxyCommand on port 3128, `GIT_CONFIG_PARAMETERS='http.proxyAuthMethod=basic'`, `JAVA_TOOL_OPTIONS` proxy agent, `RSYNC_PROXY=localhost:1080`. `NO_PROXY` covers localhost and RFC1918 ranges.
-- No `CLAUDE_SKILL_DIR`, `CLAUDE_PLUGIN_ROOT`, or any other `*SKILL*`/`*PLUGIN*` variable — see [skill placeholders unset](skill-placeholders-unset-in-cowork.md).
+- No `CLAUDE_SKILL_DIR`, `CLAUDE_PLUGIN_ROOT`, or any other `*SKILL*`/`*PLUGIN*` environment variable; the placeholders are text substitutions — see [skill placeholders in Cowork](skill-placeholders-unset-in-cowork.md).
 
 ## Tools
 

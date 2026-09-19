@@ -35,9 +35,9 @@ Source: documented — `CLAUDE.md`.
 
 ## `${CLAUDE_SKILL_DIR}` / `${CLAUDE_PLUGIN_ROOT}` are empty in a skill's shell command
 
-Cause: in Cowork the placeholders are not environment variables and were not substituted for a `/plugin:skill` invocation.
+Cause: the placeholders are text substitutions in the SKILL.md body, never environment variables. `$CLAUDE_SKILL_DIR` in a shell command is always empty; write `${CLAUDE_SKILL_DIR}` so it is substituted before the command runs. In Cowork it is substituted to the Windows host path.
 Fallback: the plugin tree is at `~/mnt/.remote-plugins/plugin_<id>/`, read-only; the id matches the Windows base-directory path in the skill header.
-Full record: [skill placeholders unset in Cowork](skill-placeholders-unset-in-cowork.md). A second run did substitute them. Practice for both harnesses: [cross-harness plugins](cross-harness-plugins.md).
+Full record: [skill placeholders in Cowork](skill-placeholders-unset-in-cowork.md). Practice for both harnesses: [cross-harness plugins](cross-harness-plugins.md).
 Source: observed 2026-09-19 — `done:init` smoke.
 
 ## Cowork sandbox facts a plugin script may depend on

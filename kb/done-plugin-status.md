@@ -34,7 +34,7 @@ Planned skills: `init` (scaffold `.done/` + interview), `what-now` (sync facts, 
 | PR #5 `feat(done): scaffold plugin with Cowork smoke init` | merged 2026-09-14; released as `done` 0.2.0 (PR #6) |
 | Smoke v1 in Cowork | ran; `CLAUDE_SKILL_DIR` empty. The test was flawed: it read a shell variable, but the placeholder is text substitution. Established: `node` v22.23.2 present, `gh` absent, git 2.34.1 |
 | PR #7 `fix(done): smoke test reads substituted skill path, not env var` | merged; smoke v2 echoes the substituted placeholder text, env, and searches for the plugin on disk |
-| Smoke v2 / environment probe in Cowork | ran; results in [skill placeholders unset in Cowork](skill-placeholders-unset-in-cowork.md) and [Cowork sandbox environment](cowork-sandbox-environment.md) |
+| Smoke v2 / environment probe in Cowork | ran; placeholders substituted to the Windows host path; results in [skill placeholders in Cowork](skill-placeholders-unset-in-cowork.md) and [Cowork sandbox environment](cowork-sandbox-environment.md) |
 | Knowledge base commit `801ac68 docs: add knowledge base and garden state` | pushed onto the PR #7 branch; a squash-merge files it under the `fix(done)` title unless split out |
 | Tasks 2–13 (scripts, templates, strategy, real skills) | not started |
 

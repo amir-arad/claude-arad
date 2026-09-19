@@ -9,7 +9,7 @@ synthesized_from:
 
 # Writing plugins and skills that work in both Claude Code and Cowork
 
-What is known about making one plugin from this marketplace run in both harnesses. Each point is marked as **evidence** (docs read or output observed) or **inference**. The evidence is thin: two smoke runs of one plugin (`done`) on one Windows machine, 2026-09-19.
+What is known about making one plugin from this marketplace run in both harnesses. Each point is marked as **evidence** (docs read or output observed) or **inference**. The evidence is thin: one run each of two smoke tests of one plugin (`done`) on one Windows machine, 2026-09-19.
 
 ## Distribution: the same marketplace serves both
 
@@ -24,22 +24,22 @@ What is known about making one plugin from this marketplace run in both harnesse
 
 ## Path placeholders `${CLAUDE_SKILL_DIR}` and `${CLAUDE_PLUGIN_ROOT}`
 
-- **Evidence (Cowork system prompt, quoted in [placeholders unset](skill-placeholders-unset-in-cowork.md)):** they are text substitutions that "only the Skill tool fills in". They are not environment variables. Neither harness exports them to the shell, so `echo "$CLAUDE_SKILL_DIR"` is always empty. A smoke test must print the substituted text instead, e.g. `[${CLAUDE_SKILL_DIR}]`.
-- **Evidence (observed, two runs):**
+- **Evidence (Cowork system prompt, quoted in [skill placeholders in Cowork](skill-placeholders-unset-in-cowork.md)):** they are text substitutions that "only the Skill tool fills in". They are not environment variables. Neither harness exports them to the shell, so `echo "$CLAUDE_SKILL_DIR"` is always empty. A smoke test must print the substituted text instead, e.g. `[${CLAUDE_SKILL_DIR}]`.
+- **Evidence (observed, two different smoke tests, PR #7 is the change between them):**
 
-| Run | Result |
-|---|---|
-| First (other session) | placeholders appeared literally, not substituted |
-| Second (`/init`, smoke v2) | both substituted, to the **Windows host path** |
+| Smoke | What it tested | Result in Cowork |
+|---|---|---|
+| v1 | shell variable `$CLAUDE_SKILL_DIR` | empty. Says nothing about substitution |
+| v2 | substituted text `${CLAUDE_SKILL_DIR}`, `${CLAUDE_PLUGIN_ROOT}` | both substituted, to the **Windows host path** |
 
-  Why the two runs differ is unknown.
-- **Evidence (observed, second run):** the substituted text was the host path, yet the `ls` commands ran against the sandbox path `/sessions/<name>/mnt/.remote-plugins/plugin_<id>/...` and succeeded. **Unknown:** whether the Cowork shell tool translates host paths or the Cowork model rewrote the command.
-- **Evidence (docs):** `${CLAUDE_SKILL_DIR}` is the documented cross-product variable ([Creating custom skills](https://claude.com/docs/skills/how-to)). `${CLAUDE_PLUGIN_ROOT}` is documented for Claude Code; in Cowork it was substituted in the second run only.
+- **Evidence (observed, v2):** the substituted text was the host path, yet the `ls` commands ran against the sandbox path `/sessions/<name>/mnt/.remote-plugins/plugin_<id>/...` and succeeded. **Unknown:** whether the Cowork shell tool translates host paths or the Cowork model rewrote the command.
+- **Evidence (docs):** `${CLAUDE_SKILL_DIR}` is the documented cross-product variable ([Creating custom skills](https://claude.com/docs/skills/how-to)). `${CLAUDE_PLUGIN_ROOT}` is documented for Claude Code, and v2 showed Cowork substitutes it too.
+- **Inference (from the system-prompt quote):** a SKILL.md read with a file tool, rather than received through the Skill tool, keeps its placeholders blank. That affects skills that compose other skills by path.
 
 **Practice adopted for `done` (design, not yet verified in Cowork):**
 1. Reference every file through `${CLAUDE_SKILL_DIR}`, reaching shared plugin files as `${CLAUDE_SKILL_DIR}/../../<dir>/...`.
 2. Give each skill a fallback rule. If the path is empty, literal, or a drive-letter path that does not exist, take the `plugin_<id>/...` suffix and put `~/mnt/.remote-plugins/` in front of it. With no id, grep `~/mnt/.remote-plugins/*/.claude-plugin/plugin.json` for the plugin's `"name"`.
-3. `garden` uses `${CLAUDE_PLUGIN_ROOT}` throughout. Its behaviour in Cowork is untested.
+3. `garden` uses `${CLAUDE_PLUGIN_ROOT}` throughout. v2 shows Cowork substitutes it, but garden itself is untested in Cowork, including its path composition in `maintain`.
 
 ## Running scripts
 
