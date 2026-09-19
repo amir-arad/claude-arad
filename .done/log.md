@@ -6,3 +6,4 @@ v<N> is the version the run wrote: state.md for what-now, plan.md for goals, 1 f
 # Log
 
 - 2026-09-19 init v1 rule:- card:- scaffolded .done/
+- 2026-09-19 goals v2 rule:- card:- first plan: M1 Cowork e2e-2, M2 real-project use, M3 next scope; template row deleted
