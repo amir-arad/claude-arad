@@ -15,6 +15,10 @@ Hub for `claude-arad`. One entry per doc; link text carries a word from the doc'
 
 - [Runbooks: known failures and how plugins find their own files](runbooks.md) — Release PR not opening, silent skip on name mismatch, 403, squash-merge, and the Cowork sandbox findings (`${CLAUDE_SKILL_DIR}` empty, plugin mount path, outputs delete restriction).
 
+## Work in progress
+
+- [Done plugin: where the work stands](done-plugin-status.md) — the `done` solo-project plugin: spec and plan paths, user decisions, PRs and releases so far, Cowork smoke results, proposed changes and open questions.
+
 ## Observed environments
 
 - [Cowork sandbox environment facts](cowork-sandbox-environment.md) — probe of the Cowork Linux sandbox: shell, tools, proxy, `~/mnt` folders and their write permissions, plugin location on disk, cowork tools.
