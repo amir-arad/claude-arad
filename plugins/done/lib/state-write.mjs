@@ -22,7 +22,7 @@ export function guardedWrite({ file, expectVersion, content, root, date }) {
     }
     // Archived cards leave the plan, so drop them from other rows' Blocked on or the plan stops validating.
     const gone = new Set(archived);
-    const fix = new Set(plan.milestones.flatMap((m) => m.cards).filter((c) => c.blockedOn.some((b) => gone.has(b.ref))).map((c) => c.line - 1));
+    const fix = new Set(plan.milestones.flatMap((m) => m.cards).filter((c) => c.blockedOn.some((b) => b.kind === 'card' && gone.has(b.ref))).map((c) => c.line - 1));
     body = body.split(/\r?\n/).map((l, i) => {
       if (!fix.has(i)) return l;
       const c = l.split('|');  // ['', Card, Action, Mode, Owner, Blocked on, Status, '']

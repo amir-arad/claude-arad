@@ -36,6 +36,7 @@ b. **GitHub** — only when project.md has `sync: github`. First match wins:
    ```
    node ${CLAUDE_SKILL_DIR}/../../lib/sync-github.mjs --repo <sync.repo> --ready-label <sync.labels.ready> --in-progress-label <sync.labels.in_progress> --since SINCE > "ROOT/.done/work/github.json"
    ```
+   Exit 2 (e.g. `gh` not authenticated) → try 2.
 2. A GitHub MCP connector is available. Find it by function, not by name: its tool names may be `mcp__<uuid>__*` with no `github` in them. Look (including deferred tools) for tools that list pull requests and list issues for a repo (e.g. `list_pull_requests`, `list_issues`). Call them for `<sync.repo>` and save each result's list of items, as returned, as a JSON array (unwrap an outer object such as `{"items": [...]}`; do not rename fields):
    - `ROOT/.done/work/merged.json` ← closed pull requests, most recently updated first, 30 max
    - `ROOT/.done/work/open.json` ← open pull requests
@@ -45,7 +46,7 @@ b. **GitHub** — only when project.md has `sync: github`. First match wins:
    node ${CLAUDE_SKILL_DIR}/../../lib/sync-github.mjs --from-dir "ROOT/.done/work" --repo <sync.repo> --ready-label <..> --in-progress-label <..> --since SINCE > "ROOT/.done/work/github.json"
    ```
    Name the connector tools you used in the Deltas output (`sync: connector <tool names>`).
-3. Neither → git facts only; say `sync: no GitHub access, git only` in Deltas.
+3. Neither works → git facts only; say `sync: no GitHub access, git only` in Deltas.
 
 c. **self-report** — `sync: self-report`, or no facts at all: ask one question: "What changed since SINCE? Merged, opened, ruled, blocked — one line each." The answer is the facts.
 
