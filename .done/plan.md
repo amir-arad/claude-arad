@@ -1,4 +1,4 @@
-<!-- version: 2 -->
+<!-- version: 4 -->
 <!-- FORMAT CONTRACT (done plugin)
 Milestones: `## <ID> — <title>` in priority order. ID = letters+digits, e.g. M1.
 Cards: one table row per card under a milestone, columns exactly:
@@ -14,7 +14,7 @@ Derived, never hand-written: READY NOW, IN FLIGHT, DECIDE order (cards.mjs deriv
 -->
 # Plan
 
-## M1 — Proven in Cowork on 0.4.3
+## M1 — Proven in Cowork on 0.5.0
 
 Exit: all 6 steps of kb/done-cowork-e2e-2.md pass, or every failure has a merged fix.
 
@@ -25,17 +25,18 @@ Exit: all 6 steps of kb/done-cowork-e2e-2.md pass, or every failure has a merged
 
 ## M2 — Used on a real project
 
-Exit: one real project runs on done for a week of what-now; conversion cost and friction recorded in kb.
+Exit: one real milestone of a real project is finished using done; conversion cost and friction recorded in kb.
 
 | Card | Action | Mode | Owner | Blocked on | Status |
 |---|---|---|---|---|---|
 | M2.1 | Pick the first real project (starwards playbook via init --from, or this repo only); consumed by M2.2 | DECIDE |  |  | open |
 | M2.2 | Run init --from on the chosen project; record conversion cost and dropped rows in kb | DO |  | M2.1 | open |
-| M2.3 | Use what-now daily for a week; log each friction point in kb | DO |  | M2.2 | open |
+| M2.3 | Finish one real milestone of the chosen project using what-now; log each friction point in kb | DO |  | M2.2 | open |
+| M2.4 | Merge or close #22 (tracks this repo with done; .done/ is public) | REVIEW |  |  | pr #22 |
 
 ## M3 — Next scope
 
-Exit: the next strategy beyond agent-fleet is chosen, with a goals run scoping it.
+Exit: the next strategy beyond value-ladder is chosen, with a goals run scoping it.
 
 | Card | Action | Mode | Owner | Blocked on | Status |
 |---|---|---|---|---|---|
