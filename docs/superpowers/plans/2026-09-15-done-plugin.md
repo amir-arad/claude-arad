@@ -15,6 +15,20 @@
 
 `starwards-what-now` (helios/starwards-design) routed the user's free hours for 6 weeks; its playbook went v1→v118 while the skill stayed frozen. Evidence in the spec §2 shows what drifted when the model hand-maintained derived data (READY NOW lists, DECIDE order, changelog), what clobbered (concurrent writes, with git), and what never ran (goals mode). This plugin makes facts script-derived, writes guarded, logs script-appended, and replanning procedure-shaped. Design was reviewed by a second session; all decisions are in the spec.
 
+## Revisions after Gate 0 (2026-09-19)
+
+Gate 0 ran (smoke v2, v3, fresh session; kb/cowork-smoke-v3-results.md). Spec §5, §7, §8 updated. Deltas that override the task text below:
+- Task 1: done (PRs #5, #7, #9; `done` 0.2.2). The init stub is smoke v3 plus `lib/smoke.mjs`; Task 8 deletes `smoke.mjs`, Task 10 replaces the stub.
+- Decision table result: placeholders substituted, node present, `gh` absent → script steps primary.
+- Task 2: `parseProject` accepts `sync: git | github | self-report`; default `git`. Add `writeAtomic(file, text)` (temp file in the same dir + `renameSync`); every script write uses it or `appendFileSync`. No script calls `unlink`/`rm`.
+- Task 3: project template `sync: git`.
+- Task 5: `sync-github.mjs` gains `--from-dir <dir>` reading `merged.json`, `open.json`, `issues.json` saved by the model from a GitHub MCP connector. `buildFacts` normalises gh and REST shapes (`author.login|user.login`, `mergedAt|merged_at`, `updatedAt|updated_at`, `headRefName|head.ref`, `isDraft|draft`). Manual check uses `amir-arad/claude-arad`.
+- Task 5b (new): `lib/sync-git.mjs <root> [--since D] [--json]` → `{source: "git", root, since, commits: [{sha, date, subject, refs}], errors}` from `git log` only. `buildGitFacts(logText)` is pure and tested. Not a repo → exit 2.
+- Task 6: `counts` also accepts git facts (no blockers from them).
+- Task 7: `guardedWrite` writes via `writeAtomic`.
+- Task 10: init resolves the project root per spec §8 before scaffolding.
+- Task 11: sync step per spec §5 step 2.
+
 ## Global Constraints
 
 - Plugin dir `plugins/done/` and `plugin.json` `name` must both be `done` (repo CLAUDE.md).
