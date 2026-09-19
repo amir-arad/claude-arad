@@ -45,3 +45,10 @@ Use conventional commits for automatic versioning:
 Each plugin versions independently: a commit bumps only plugins whose directories it touches.
 
 Squash-merge: the PR title is the commit Release Please reads, so it needs the prefix. If a Release PR never opens, remove any stale `autorelease: pending` label from old PRs.
+
+## Knowledge base
+
+Project documentation lives in `kb/`. Start at the index:
+
+- [kb index](kb/index.md) — the knowledge base hub: architecture, setup, deployment,
+  runbooks and glossary entries, each linked under its own subject terms.
