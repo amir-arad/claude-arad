@@ -1,0 +1,4 @@
+[
+  {"number": 2225, "title": "Registry A", "user": {"login": "agent1"}, "updated_at": "2026-09-14T00:00:00Z", "head": {"ref": "reg-a"}, "body": "Closes #2131", "draft": false},
+  {"number": 2226, "title": "Registry B", "user": {"login": "agent2"}, "updated_at": "2026-09-14T00:00:00Z", "head": {"ref": "reg-b"}, "body": "fixes #2131", "draft": true}
+]

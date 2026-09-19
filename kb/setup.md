@@ -9,7 +9,7 @@
 | Python 3 | unspecified | only for `plugins/base-plugin/skills/skill-creator/scripts/*.py`; no `pyproject.toml` or `requirements.txt` |
 | Claude Code | current | to install and exercise plugins |
 
-There is no `package.json`, lockfile, `Makefile`, `.env.example`, linter config, or test suite (`setup-check`: 4 pass / 6 warn / 1 fail, the fail being `missing-env-template`). The script and libs have zero npm dependencies (`scan`: `dependencies.runtime_count: 0`).
+There is no `package.json`, lockfile, `Makefile`, `.env.example`, linter config, or repo-level test suite. `done` has node:test files: run `node --test plugins/done/test/*.test.mjs` from the repo root. A directory argument (`node --test plugins/done/test/`) fails on node 22 on Windows with `Cannot find module`. (`setup-check`: 4 pass / 6 warn / 1 fail, the fail being `missing-env-template`). The script and libs have zero npm dependencies (`scan`: `dependencies.runtime_count: 0`).
 
 ## Steps
 

@@ -58,7 +58,8 @@ plugins/done/
   lib/lib.mjs            shared: paths, contract parsing, version stamp
   lib/init-scaffold.mjs  idempotent scaffold, --json
   lib/cards.mjs          parse plan.md → JSON; derive ready/in-flight/blocked/decide-order; validate
-  lib/sync-github.mjs    gh CLI → JSON facts (merged/open PRs, issues, labels), --json
+  lib/sync-git.mjs       local git → JSON facts (commits since, issue refs in subjects), --json
+  lib/sync-github.mjs    GitHub raw JSON (gh CLI, or connector output saved to files) → JSON facts, --json
   lib/state-write.mjs    guarded write of state.md / plan.md (version stamp), --json
   lib/log-append.mjs     append one line to log.md
   lib/counts.mjs         constraint counts from cards + facts → JSON
@@ -81,7 +82,7 @@ All skills: `disable-model-invocation: true`. All paths via `${CLAUDE_SKILL_DIR}
 ### project.md
 ```
 name, root, strategy: agent-fleet
-sync: github {repo, labels: {ready, in-progress}} | self-report
+sync: git | github {repo, labels: {ready, in-progress}} | self-report
 capacity: agents | people | none
 thresholds: {max_in_flight, rebase_after, ...}      # overrides strategy defaults
 gates: {dispatch: human, review-ruling: human, ...} # overrides modes.md
@@ -126,14 +127,17 @@ log-append.mjs from JSON the skill hands it. Never a paragraph.
 1. `node lib/init-scaffold.mjs <root> --json` — creates `.done/` from templates if absent, never
    overwrites, reports what exists.
 2. Interview (dream-style, one question at a time): project name, goal in one sentence, strategy
-   (only agent-fleet), sync (github repo + labels | self-report), capacity, never-touch surfaces,
+   (only agent-fleet), sync (git | github repo + labels | self-report), capacity, never-touch surfaces,
    thresholds to override. Write project.md.
 3. If a legacy playbook/plan path is given: offer to convert cards; run cards.mjs validate; list
    rejected rows for the user to fix. No silent rewrite.
 
 ### what-now
 1. **Read** project.md, state.md (note version), plan.md, last N log lines.
-2. **Sync**: `sync: github` → `node lib/sync-github.mjs --json`; `self-report` → ask the user for
+2. **Sync**: always `node lib/sync-git.mjs <root> --json` when `<root>` is a git repo. `sync: github` adds
+   GitHub facts: `gh` present → `node lib/sync-github.mjs --repo X --json`; else a GitHub MCP connector
+   (found by tool function, e.g. `list_pull_requests`) → model saves raw results to files →
+   `node lib/sync-github.mjs --from-dir <dir> --json`; neither → git facts only, say so. `self-report` → ask the user for
    deltas in one prompt ("what changed since <last run>?") and treat the answer as facts.
 3. **Reconcile** facts → card status cells (merged → done, PR opened → pr #N, label → dispatched).
    Run `failure-checks.md` "after sync" list (stale labels, duplicate claims, PR behind base,
@@ -193,8 +197,12 @@ evidence, junk drafts, label without worker, untracked dispatch, single-writer c
 Node ≥ 18, no dependencies, `--json` output, exit 0 facts / 1 usage / 2 refused (validation or stamp).
 - `cards.mjs parse|validate|derive <plan.md>`
 - `counts.mjs <root>` → `{awaiting_gate, in_flight, ready_dispatch, ready_decide, ready_qa, blockers}`
-- `sync-github.mjs --repo X --labels a,b` → PRs merged since last run, open PRs (author, behind-by),
-  issues with labels. `gh` absent → exit 2 with message; skill falls back to self-report for the run.
+- `sync-git.mjs <root> [--since D]` → commits since D (sha, date, subject, `#N` refs). Reads `git log` only;
+  `git status` is not used (Cowork git reports host CRLF files as modified).
+- `sync-github.mjs --repo X --labels a,b | --from-dir <dir>` → PRs merged since last run, open PRs (author, behind-by),
+  issues with labels. Accepts gh JSON and GitHub REST JSON (connector) shapes. `gh` absent without
+  `--from-dir` → exit 2 with message.
+- All writes: overwrite or temp file + rename. Never delete (Cowork blocks unlink before a per-session grant).
 - `state-write.mjs <file> --expect-version N --from <json|stdin>` → writes, bumps stamp, moves done
   cards to log when file is plan.md.
 - `log-append.mjs <root> --run what-now --rule 3 --card M4.1 --text "..."`
@@ -205,27 +213,29 @@ The starwards gap-closing-plan.md converted to the grammar is a fixture.
 
 ## 8. Harness — Cowork install is a requirement, not a check
 
-Evidence (docs, 2026-09-15):
-- Cowork installs plugins from a GitHub repo marketplace (`owner/repo`), "full plugin support";
-  Claude runs "inside an isolated virtual machine" (claude.com/docs/cowork/guide/plugins, /docs/plugins/overview).
-- Skills may ship Node.js/Bash scripts; `${CLAUDE_SKILL_DIR}` is the documented path variable
-  (claude.com/docs/skills/how-to). `${CLAUDE_PLUGIN_ROOT}` is documented for Claude Code only.
-- Not documented: whether `node` and `gh` exist in the Cowork VM.
+Evidence: Cowork runs 2026-09-19 (kb/cowork-smoke-v3-results.md, kb/cowork-raw-runs-2026-09-19.md).
+- `${CLAUDE_SKILL_DIR}` and `${CLAUDE_PLUGIN_ROOT}` are substituted to the Windows host path; the shell,
+  `node` and the Read tool resolve it to `~/mnt/.remote-plugins/plugin_<id>/...`. node v22, git 2.34, no `gh`.
+- The selected project folder is `~/mnt/<name>`; cwd is the session home. The folder's Windows path does
+  not resolve in bash.
+- In the folder: create, overwrite, rename work; unlink needs `mcp__cowork__allow_cowork_file_delete`, per session.
+- GitHub: HTTPS blocked by the proxy, SSH fetch fails. The GitHub MCP connector works; its tools are
+  `mcp__<uuid>__*` (no `github` in the name).
+- Cowork git sees host CRLF working-tree files as modified.
 
-Design consequences:
-- Path references use `${CLAUDE_SKILL_DIR}` only: shared files as `${CLAUDE_SKILL_DIR}/../../lib/...`,
-  `${CLAUDE_SKILL_DIR}/../../strategies/...`. Never `${CLAUDE_PLUGIN_ROOT}`.
-- Every script step in a SKILL.md carries a "no node" fallback: the model performs the derivation by
-  hand and marks the log line `manual:`. `gh` absent → self-report for the run (already in §7).
+Design rules:
+- Paths: `${CLAUDE_SKILL_DIR}/../../<dir>/...`. No rebuild fallback.
+- Project root: in Claude Code, the cwd repo root. In Cowork, the single entry under `~/mnt/` other than
+  `outputs`, `uploads` and dot-dirs; several → ask; none → call `request_cowork_directory`. Never the
+  session home, `outputs/` or the Windows path. `.done/` lives at the project root. Scripts take the
+  root as an argument.
+- Writes: overwrite or temp + rename; no script deletes. No delete grant needed.
+- Sync: see §5 what-now step 2. Generic: no org or repo is built in; labels are project.md config.
+- Every script step keeps a manual fallback, log line prefixed `manual:`.
 - Skill frontmatter: only `name`, `description`, `disable-model-invocation`, `argument-hint`.
-- **Gate 0 of the implementation plan**: a stub `done` plugin (plugin.json + `init` skill that prints
-  `${CLAUDE_SKILL_DIR}`, `node --version`, `gh --version`) is pushed; the user installs the
-  `amir-arad/claude-arad` marketplace in Cowork and runs `/done:init`. Output decides whether script steps
-  are primary or fallback-only in Cowork. No further skill is written before this result.
-- Cowork git locks: not the plugin's concern; the helios CLAUDE.md rule stays in that repo.
 
 ## 9. Open risks
 - Strict grammar rejects the current playbook; conversion is manual. Cost unmeasured.
 - Precedence rule 1 rests on one rot episode (v94).
 - All evidence is one project with one fleet workflow; self-report and capacity=none are untested.
-- Cowork support is an assumption until the harness check runs.
+- Cowork: one machine, one folder. Multiple selected folders and model-invoked (non-slash) skills untested.

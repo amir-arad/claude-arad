@@ -1,0 +1,5 @@
+[
+  {"number": 2224, "title": "Bump deps", "author": {"login": "dependabot[bot]"}, "updatedAt": "2026-09-14T00:00:00Z", "headRefName": "deps", "body": "", "isDraft": false},
+  {"number": 2225, "title": "Registry A", "author": {"login": "agent1"}, "updatedAt": "2026-09-14T00:00:00Z", "headRefName": "reg-a", "body": "Closes #2131", "isDraft": false},
+  {"number": 2226, "title": "Registry B", "author": {"login": "agent2"}, "updatedAt": "2026-09-14T00:00:00Z", "headRefName": "reg-b", "body": "fixes #2131", "isDraft": true}
+]
