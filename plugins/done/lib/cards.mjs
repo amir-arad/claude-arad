@@ -3,8 +3,8 @@ import { parseArgs, fail, emit, readText, readVersion, isMain } from './lib.mjs'
 
 export const CARD_ID = /^[A-Za-z]+\d+\.\d+$/;
 export const MILESTONE_HEAD = /^## ([A-Za-z]+\d+) — (.+)$/;
-export const MODES = ['DECIDE', 'DISPATCH', 'REVIEW', 'QA', 'DO'];
-const STATUS_RE = /^(open|filed #(\d+)|dispatched #(\d+)|pr #(\d+)|ruled (\d{4}-\d{2}-\d{2})|done (\d{4}-\d{2}-\d{2}))$/;
+export const MODES = ['DECIDE', 'REVIEW', 'QA', 'DO'];
+const STATUS_RE = /^(open|filed #(\d+)|pr #(\d+)|ruled (\d{4}-\d{2}-\d{2})|done (\d{4}-\d{2}-\d{2}))$/;
 // A literal | inside a cell is written \| (GitHub table syntax).
 export const CELL_SPLIT = /(?<!\\)\|/;
 const HEADER = ['Card', 'Action', 'Mode', 'Owner', 'Blocked on', 'Status'];
@@ -55,10 +55,10 @@ export function parsePlan(text) {
       }
     }
     const sm = STATUS_RE.exec(status);
-    if (!sm) out.problems.push(`line ${n}: ${id} Status "${status}" not in open|filed #N|dispatched #N|pr #N|ruled DATE|done DATE`);
+    if (!sm) out.problems.push(`line ${n}: ${id} Status "${status}" not in open|filed #N|pr #N|ruled DATE|done DATE`);
     else {
       const kind = sm[1].split(' ')[0];
-      card.status = { kind, ref: sm[2] || sm[3] || sm[4] || sm[5] || sm[6] || undefined };
+      card.status = { kind, ref: sm[2] || sm[3] || sm[4] || sm[5] || undefined };
     }
     ms.cards.push(card);
   });
@@ -84,11 +84,10 @@ export function derive(plan) {
   const cards = plan.milestones.flatMap((m) => m.cards);
   const byId = new Map(cards.map((c) => [c.id, c]));
   const settled = (id) => { const s = byId.get(id)?.status?.kind; return s === 'done' || s === 'ruled'; };
-  const res = { ready: [], inFlight: [], awaitingGate: [], blocked: {}, decideOrder: [], done: [] };
+  const res = { ready: [], awaitingGate: [], blocked: {}, decideOrder: [], unblocks: {}, done: [] };
   for (const c of cards) {
     const k = c.status?.kind;
     if (k === 'done' || k === 'ruled') { res.done.push(c.id); continue; }
-    if (k === 'dispatched' || k === 'pr') res.inFlight.push(c.id);
     if (k === 'pr') res.awaitingGate.push(c.id);
     const open = c.blockedOn.filter((b) => b.kind !== 'card' || !settled(b.ref));
     if (open.length) res.blocked[c.id] = open.map((b) => (b.kind === 'card' ? b.ref : `${b.kind}:${b.ref}`));
@@ -102,6 +101,7 @@ export function derive(plan) {
     return seen.size;
   };
   for (const id of dependents.keys()) dependents.set(id, countTransitive(id));
+  for (const id of res.ready) res.unblocks[id] = dependents.get(id);
   const order = new Map(cards.map((c, i) => [c.id, i]));
   res.decideOrder = res.ready
     .filter((id) => byId.get(id).mode === 'DECIDE')
@@ -115,7 +115,7 @@ Usage:
   node cards.mjs parse    <plan.md> [--json]
   node cards.mjs validate <plan.md> [--log log.md] [--json]   exit 2 and list problems if the grammar is violated;
                                                    --log also rejects ids of cards archived in log.md
-  node cards.mjs derive   <plan.md> [--json]     ready / in-flight / awaiting-gate / blocked / decide order
+  node cards.mjs derive   <plan.md> [--json]     ready / awaiting-gate / blocked / decide order / unblocks
 Exit codes: 0 ok, 1 usage, 2 validation failed.
 `;
 
