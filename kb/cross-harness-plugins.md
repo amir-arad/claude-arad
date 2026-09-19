@@ -3,82 +3,89 @@ date: 2026-09-19
 related: [skill-placeholders-unset-in-cowork.md, cowork-sandbox-environment.md, runbooks.md, done-plugin-status.md, architecture.md]
 synthesized_from:
   date: 2026-09-19
-  topic: "Building the done plugin for Claude Code and Claude Cowork: docs read, two Cowork smoke runs"
+  topic: "Building the done plugin for Claude Code and Claude Cowork: docs read, two Cowork smoke tests"
   tool: claude-code
 ---
 
-# Writing plugins and skills that work in both Claude Code and Cowork
+# Cross-harness plugins: writing skills that work in both Claude Code and Cowork
 
-What is known about making one plugin from this marketplace run in both harnesses. Each point is marked as **evidence** (docs read or output observed) or **inference**. The evidence is thin: one run each of two smoke tests of one plugin (`done`) on one Windows machine, 2026-09-19.
+Evidence base: docs, plus one run each of two smoke tests of `done` in Cowork, on one Windows host, 2026-09-19.
 
-## Distribution: the same marketplace serves both
+## Distribution
 
-- **Evidence (docs):** Cowork installs plugins from a GitHub repository used as a marketplace (Customize → Plugins → Add marketplace, `owner/repo` form). Plugins are "fully supported" in Cowork. [Install plugins](https://claude.com/docs/cowork/guide/plugins), [Plugins overview](https://claude.com/docs/plugins/overview).
-- **Evidence (observed):** `amir-arad/claude-arad` installed in Cowork, and `done` 0.2.0 ran there. After a release, Cowork needs **Update** on the marketplace before it sees the new version.
-- No change to `plugin.json` or `marketplace.json` was needed for Cowork.
+- Cowork installs from a GitHub repo marketplace: Customize → Plugins → Add marketplace, `owner/repo`. See [Install plugins](https://claude.com/docs/cowork/guide/plugins).
+- `amir-arad/claude-arad` installed. `done` 0.2.0 ran.
+- After a release, click **Update** on the marketplace in Cowork.
+- `plugin.json` and `marketplace.json` needed no Cowork-specific change.
 
-## Where the plugin's own files are
+## Plugin files
 
-- **Evidence (observed):** in Cowork the installed plugin is a read-only tree at `~/mnt/.remote-plugins/plugin_<id>/`. `<id>` is opaque (`plugin_01Rkn9mi36M72QHEcZWLSkZX`) and not the plugin name. So `find ... -path '*<plugin-name>*'` finds nothing.
-- **Evidence (observed):** the host-side copy is `C:/Users/<user>/AppData/Roaming/Claude/local-agent-mode-sessions/<uuid>/<uuid>/rpm/plugin_<id>/`, and the id is the same on both sides.
+| Side | Path |
+|---|---|
+| Cowork sandbox | `~/mnt/.remote-plugins/plugin_<id>/`, read-only |
+| Windows host | `C:/Users/<user>/AppData/Roaming/Claude/local-agent-mode-sessions/<uuid>/<uuid>/rpm/plugin_<id>/` |
 
-## Path placeholders `${CLAUDE_SKILL_DIR}` and `${CLAUDE_PLUGIN_ROOT}`
+- `<id>` is opaque and the same on both sides.
+- The plugin name is not in the path, so `find -path '*<plugin-name>*'` fails.
 
-- **Evidence (Cowork system prompt, quoted in [skill placeholders in Cowork](skill-placeholders-unset-in-cowork.md)):** they are text substitutions that "only the Skill tool fills in". They are not environment variables. Neither harness exports them to the shell, so `echo "$CLAUDE_SKILL_DIR"` is always empty. A smoke test must print the substituted text instead, e.g. `[${CLAUDE_SKILL_DIR}]`.
-- **Evidence (observed, two different smoke tests, PR #7 is the change between them):**
+## Placeholders `${CLAUDE_SKILL_DIR}`, `${CLAUDE_PLUGIN_ROOT}`
 
-| Smoke | What it tested | Result in Cowork |
+- They are text substitutions, never environment variables, so `$CLAUDE_SKILL_DIR` in a shell is empty.
+- A smoke test must print the text, e.g. `[${CLAUDE_SKILL_DIR}]`.
+- Cowork system prompt: the Skill tool alone fills them in, and a SKILL.md read with a file tool keeps them blank. Quote: [skill placeholders in Cowork](skill-placeholders-unset-in-cowork.md).
+
+| Smoke | Tested | Cowork result |
 |---|---|---|
-| v1 | shell variable `$CLAUDE_SKILL_DIR` | empty. Says nothing about substitution |
-| v2 | substituted text `${CLAUDE_SKILL_DIR}`, `${CLAUDE_PLUGIN_ROOT}` | both substituted, to the **Windows host path** |
+| v1 | shell `$CLAUDE_SKILL_DIR` | empty. No substitution result |
+| v2 (PR #7) | text `${CLAUDE_SKILL_DIR}`, `${CLAUDE_PLUGIN_ROOT}` | both substituted, to the Windows host path |
 
-- **Evidence (observed, v2):** the substituted text was the host path, yet the `ls` commands ran against the sandbox path `/sessions/<name>/mnt/.remote-plugins/plugin_<id>/...` and succeeded. **Unknown:** whether the Cowork shell tool translates host paths or the Cowork model rewrote the command.
-- **Evidence (docs):** `${CLAUDE_SKILL_DIR}` is the documented cross-product variable ([Creating custom skills](https://claude.com/docs/skills/how-to)). `${CLAUDE_PLUGIN_ROOT}` is documented for Claude Code, and v2 showed Cowork substitutes it too.
-- **Inference (from the system-prompt quote):** a SKILL.md read with a file tool, rather than received through the Skill tool, keeps its placeholders blank. That affects skills that compose other skills by path.
+- In v2, `ls` through the host path succeeded against the sandbox path. The mapper is unknown: the shell tool or the model.
+- Docs name `${CLAUDE_SKILL_DIR}` for skills generally ([Creating custom skills](https://claude.com/docs/skills/how-to)) and `${CLAUDE_PLUGIN_ROOT}` for Claude Code. Cowork substituted both.
 
-**Practice adopted for `done` (design, not yet verified in Cowork):**
-1. Reference every file through `${CLAUDE_SKILL_DIR}`, reaching shared plugin files as `${CLAUDE_SKILL_DIR}/../../<dir>/...`.
-2. Give each skill a fallback rule. If the path is empty, literal, or a drive-letter path that does not exist, take the `plugin_<id>/...` suffix and put `~/mnt/.remote-plugins/` in front of it. With no id, grep `~/mnt/.remote-plugins/*/.claude-plugin/plugin.json` for the plugin's `"name"`.
-3. `garden` uses `${CLAUDE_PLUGIN_ROOT}` throughout. v2 shows Cowork substitutes it, but garden itself is untested in Cowork, including its path composition in `maintain`.
+`done` design (unverified):
+1. All paths use `${CLAUDE_SKILL_DIR}/../../<dir>/...`.
+2. If the path doesn't exist, rebuild it as `~/mnt/.remote-plugins/plugin_<id>/...`. With no id, grep `~/mnt/.remote-plugins/*/.claude-plugin/plugin.json` for `"name"`.
 
-## Running scripts
+`garden` uses `${CLAUDE_PLUGIN_ROOT}` and is untested in Cowork.
 
-- **Evidence (observed):** the Cowork sandbox has `node` v22.23.2, npm 10.9.8, python3 3.10.12 and git 2.34.1. `gh` is absent. The shell is `/bin/sh` on Ubuntu 22.04, and all egress goes through an authenticated localhost proxy. Details are in [Cowork sandbox environment](cowork-sandbox-environment.md).
-- **Evidence (docs):** skills may ship Python, JavaScript/Node.js or Bash scripts.
-- **Practice:** zero-dependency Node `.mjs` scripts run in both harnesses. Anything that needs `gh` must degrade, as `done` does by switching to self-report sync. Every script step in a SKILL.md gets a manual fallback the model can follow if `node` is missing, and the log marks those runs `manual:`.
-- **Inference:** windows-only assumptions such as backslash paths, `cmd`, or PowerShell break in Cowork, which runs Linux. Scripts developed on Windows for Claude Code must use `path` APIs and forward slashes.
+## Scripts
 
-## Where a skill can write
+- Cowork sandbox: Ubuntu 22.04, `/bin/sh`, `node` v22.23.2, npm 10.9.8, python3 3.10.12, git 2.34.1. `gh` absent.
+- All egress goes through an authenticated localhost proxy. See [Cowork sandbox environment](cowork-sandbox-environment.md).
+- Docs: skills may ship Python, Node.js or Bash scripts.
+- `done` approach:
+  - zero-dependency Node `.mjs`;
+  - `gh` absent → self-report sync;
+  - a manual fallback per script step, logged as `manual:`.
 
-- **Evidence (observed):**
+## Writable locations (Cowork)
 
 | Location | Behaviour |
 |---|---|
-| Home `/sessions/<name>` | per-session temporary folder; its name changed between runs |
-| `~/mnt/outputs/` | create works, `rm` is denied |
+| `/sessions/<name>` (home) | per session; the name changed between runs |
+| `~/mnt/outputs/` | create ok, `rm` denied |
 | `~/mnt/uploads/` | read-only |
-| Plugin tree | read-only |
-| User-selected folder (`mcp__cowork__request_cowork_directory`) | writable with Claude's Write/Edit tools; writing from the shell is untested |
+| plugin tree | read-only |
+| user-selected folder (`mcp__cowork__request_cowork_directory`) | Write/Edit ok; shell writes untested |
 
-- **Practice:** any per-project state (like `.done/`) must live in a folder the user selected. A skill should refuse to create it in the session home or `outputs/`, where it would not persist.
-- **Inference:** a script that deletes or renames files, such as a temp-file-then-rename write, may fail in `outputs/` and possibly elsewhere. Prefer writing in place, and treat a failed write as a refusal.
+Per-project state belongs in a user-selected folder.
 
 ## Git
 
-- **Evidence (helios `CLAUDE.md`, 2026-09-04):** in a Cowork-mounted repo, git strands `.git/*.lock` files unless file-delete permission is granted first with `mcp__cowork__allow_cowork_file_delete`. A plugin that runs git in Cowork inherits this.
+helios `CLAUDE.md` (2026-09-04): in a Cowork-mounted repo, git strands `.git/*.lock` unless `mcp__cowork__allow_cowork_file_delete` is granted first.
 
 ## Frontmatter
 
-- `name`, `description`, `disable-model-invocation: true` and `argument-hint` loaded in both harnesses (`done:init` in Cowork, garden in Claude Code). Other fields are untested in Cowork.
+`name`, `description`, `disable-model-invocation: true` and `argument-hint` work in Cowork (`done:init`) and Claude Code (`garden`). Other fields are untested in Cowork.
 
-## Smoke-test recipe for a new plugin
+## Smoke-test recipe
 
-Ship a temporary skill that prints, one line each:
-1. The substituted text of each placeholder, in brackets.
-2. `ls` of `plugin.json` through each placeholder.
-3. `env | grep -i -E 'claude|plugin|skill'`.
-4. The versions of `node`, `gh`, `git`, `python3`.
-5. `pwd`.
-6. A write-then-delete probe in the folder where state will live.
+A temporary skill prints one line per check:
+1. `[${CLAUDE_SKILL_DIR}]`, `[${CLAUDE_PLUGIN_ROOT}]`
+2. `ls` of `plugin.json` through each
+3. `env | grep -i -E 'claude|plugin|skill'`
+4. `node`, `gh`, `git`, `python3` versions
+5. `pwd`
+6. write-then-delete in the state folder
 
-Run it in both harnesses before writing real skills. `plugins/done/skills/init/SKILL.md` at `done` 0.2.x is a working example of items 1–5.
+Run it in both harnesses. `plugins/done/skills/init/SKILL.md` at 0.2.x covers 1–5.

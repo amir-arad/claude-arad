@@ -9,40 +9,38 @@ synthesized_from:
 
 # Skill placeholders `${CLAUDE_SKILL_DIR}` and `${CLAUDE_PLUGIN_ROOT}` in Cowork: substituted in text, absent from the shell
 
-Two different smoke tests ran in Cowork on 2026-09-19. PR #7 is the change between them. They tested different things, so they do not contradict each other.
+Two different smoke tests ran in Cowork on 2026-09-19. PR #7 is the change between them.
 
-## Smoke v1: shell variable check (tests nothing about substitution)
+## Smoke v1: shell variable
 
-v1 ran `echo "$CLAUDE_SKILL_DIR"` and `ls "$CLAUDE_SKILL_DIR/../../.claude-plugin/plugin.json"`. Both read the **shell environment**:
-- `echo` printed empty.
-- `ls` ran as `ls /../../.claude-plugin/plugin.json` and failed.
-- An `env | grep -i -E 'claude|plugin|skill'` probe matched only `CLAUDE_CODE_TMPDIR`, `CLAUDE_TMPDIR`, `CLAUDE_CODE_HOST_HTTP_PROXY_PORT`, `CLAUDE_CODE_HOST_SOCKS_PROXY_PORT`.
+- `echo "$CLAUDE_SKILL_DIR"` printed empty.
+- `ls "$CLAUDE_SKILL_DIR/../../.claude-plugin/plugin.json"` ran as `ls /../../.claude-plugin/plugin.json` and failed.
+- `env | grep -i -E 'claude|plugin|skill'` matched only `CLAUDE_CODE_TMPDIR`, `CLAUDE_TMPDIR`, `CLAUDE_CODE_HOST_HTTP_PROXY_PORT`, `CLAUDE_CODE_HOST_SOCKS_PROXY_PORT`.
 
-Established: no skill or plugin path **environment variable** exists in the Cowork shell. The same is expected in Claude Code, where the placeholders are also text substitutions (inference).
+Result: the Cowork shell has no path environment variable. v1 tested nothing about substitution.
 
-## Smoke v2: substituted text (PR #7)
+## Smoke v2: substituted text
 
-v2 wrote `${CLAUDE_SKILL_DIR}` and `${CLAUDE_PLUGIN_ROOT}` into the skill text and asked for them to be echoed verbatim. The `/init` run in Cowork reported:
+| Check | Output |
+|---|---|
+| `[${CLAUDE_SKILL_DIR}]` | `C:/Users/green/AppData/Roaming/Claude/local-agent-mode-sessions/8738a278-cdc2-4613-b151-e51ed4a820e6/4c4d032b-44a5-4eae-b09d-ee055211a274/rpm/plugin_01Rkn9mi36M72QHEcZWLSkZX/skills/init` |
+| `[${CLAUDE_PLUGIN_ROOT}]` | same path without `/skills/init` |
+| `ls` through each | succeeded, reported as `/sessions/practical-great-bell/mnt/.remote-plugins/plugin_01Rkn9mi36M72QHEcZWLSkZX/...` |
 
-- skill-dir text: `C:/Users/green/AppData/Roaming/Claude/local-agent-mode-sessions/8738a278-cdc2-4613-b151-e51ed4a820e6/4c4d032b-44a5-4eae-b09d-ee055211a274/rpm/plugin_01Rkn9mi36M72QHEcZWLSkZX/skills/init`
-- plugin-root text: the same path without `/skills/init`.
-- `ls` through each succeeded, reported as `/sessions/practical-great-bell/mnt/.remote-plugins/plugin_01Rkn9mi36M72QHEcZWLSkZX/...`.
+Result: both placeholders are substituted, to the Windows host path.
 
-Established: both placeholders **are substituted** in Cowork, to the **Windows host path**. Unknown: what turned the host path into the sandbox path. It was either the Cowork shell tool or the Cowork model rewriting the command.
+Unknown: what mapped the host path to the sandbox path. It was either the shell tool or the model rewriting the command.
 
-## What the Cowork system prompt says
+## Cowork system prompt, `<skills_instructions>`
 
-Quoted from the `<skills_instructions>` block: plugin skills "refer to their own folders with the placeholders `${CLAUDE_PLUGIN_ROOT}` and `${CLAUDE_SKILL_DIR}`, which only the Skill tool fills in (they are not environment variables, so a command copied from a file you read yourself runs with them blank)."
+> plugin skills refer to their own folders with the placeholders `${CLAUDE_PLUGIN_ROOT}` and `${CLAUDE_SKILL_DIR}`, which only the Skill tool fills in (they are not environment variables, so a command copied from a file you read yourself runs with them blank)
 
-Consequence: a command a model copies from a SKILL.md it read with a file tool, rather than received through the Skill tool, has the placeholders blank. This applies to skills that call other skills by path, like garden's `maintain`, which reads `survey/SKILL.md` directly (inference).
+## Plugin on disk
 
-## Where the plugin actually was
+`~/mnt/.remote-plugins/plugin_01Rkn9mi36M72QHEcZWLSkZX/` is read-only. It holds `.claude-plugin/plugin.json` (`done` 0.2.0), `skills/init/SKILL.md` and `CHANGELOG.md`. The id matches the host path. See [Cowork sandbox environment](cowork-sandbox-environment.md).
 
-`~/mnt/.remote-plugins/plugin_01Rkn9mi36M72QHEcZWLSkZX/` is read-only. It contains `.claude-plugin/plugin.json` (name `done`, 0.2.0), `skills/init/SKILL.md` and `CHANGELOG.md`, and no `lib/`. The id matches the host path's id. Details: [Cowork sandbox environment](cowork-sandbox-environment.md).
+## Not tested
 
-## Limits
-
-One plugin on one machine, Cowork only, with one run of each smoke test. Not tested:
-- the Skill-tool route versus the slash form;
-- Claude Code CLI behaviour with v2;
-- whether the host-to-sandbox path translation applies to `node <path>` calls.
+- Skill-tool route versus slash form.
+- v2 in Claude Code CLI.
+- Host-to-sandbox mapping for `node <path>`.
