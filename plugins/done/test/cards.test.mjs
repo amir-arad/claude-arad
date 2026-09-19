@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parsePlan, derive } from '../lib/cards.mjs';
+import { parsePlan, derive, retiredProblems } from '../lib/cards.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const read = (f) => fs.readFileSync(path.join(here, 'fixtures', f), 'utf8');
@@ -53,4 +53,31 @@ test('parsePlan accepts CRLF line endings', () => {
   const p = parsePlan(read('plan-valid.md').replace(/\r?\n/g, '\r\n'));
   assert.deepEqual(p.problems, []);
   assert.equal(p.milestones[1].cards.length, 7);
+});
+
+const reusePlan = `# Plan
+
+## M1 — README
+
+Exit: x
+
+| Card | Action | Mode | Owner | Blocked on | Status |
+|---|---|---|---|---|---|
+| M1.1 | Pick license | DECIDE |  |  | open |
+
+## Cut list
+
+- M1.1 "Replace me" — scaffold example (2026-09-19)
+`;
+
+test('parsePlan rejects a card id reused from the cut list', () => {
+  assert.match(parsePlan(reusePlan).problems.join('\n'), /M1\.1 reuses a cut card id/);
+});
+
+test('retiredProblems rejects a card id archived in log.md', () => {
+  const plan = parsePlan(reusePlan.replace(/- M1\.1 "Replace me".*\n/, ''));
+  assert.deepEqual(plan.problems, []);
+  const log = '- 2026-09-19 archive card:M1.1 done 2026-09-18 — Replace me\n';
+  assert.match(retiredProblems(plan, log).join('\n'), /M1\.1 reuses an archived card id/);
+  assert.deepEqual(retiredProblems(plan, '- 2026-09-19 archive card:M1.10 done x — y\n'), []);
 });

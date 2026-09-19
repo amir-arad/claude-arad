@@ -46,7 +46,8 @@ A second session (claude-arad-c1) reviewed the design. Its accepted points are i
 | Spec §5/§7/§8 + plan revisions | PR #12 (first commit) |
 | Tasks 2–8, scripts and templates | PR #12 merged, released `done` 0.3.0 |
 | Tasks 9–12, strategy + skills init/what-now/goals | branch `feat/done-skills`, 24 tests pass; `lib/smoke.mjs` removed |
-| Task 13, Cowork end-to-end | ran on 0.4.0: [results](done-cowork-e2e-results.md). 3 sync bugs + skill rename fixed in branch `fix/done-e2e-sync` |
+| Task 13, Cowork end-to-end | ran on 0.4.0: [results](done-cowork-e2e-results.md). 3 sync bugs + skill rename fixed in PR #16, released 0.4.1 |
+| Card id reuse (found in e2e) | PR #18: validate rejects reused ids; reviewed, approved |
 
 ## Decisions after smoke v2 (2026-09-19)
 
@@ -91,7 +92,7 @@ Also: bash cannot resolve the folder's Windows path, so use `~/mnt/<name>`. Outp
 Recorded in detail in the plan's "Revisions after Gate 0" section. Summary:
 - `lib/sync-git.mjs`: facts from `git log` only (commits since a date, `#N` refs). It skips `git status` because of the CRLF effect in Cowork.
 - `lib/sync-github.mjs`: `gh` (Claude Code), or `--from-dir` with `merged.json`/`open.json`/`issues.json` that the model saves from a GitHub MCP connector. It accepts both `gh` and REST shapes.
-  - The REST shape is inferred from the GitHub API docs, not recorded from a real connector call. Task 13 must check it.
+  - The REST shape was inferred from the GitHub API docs. Task 13 confirmed it: REST field names, labels as plain strings ([e2e results](done-cowork-e2e-results.md)).
 - `writeAtomic` (temp file + rename) for every rewrite; no script deletes.
 - `init-scaffold` refuses the home dir and `~/mnt/outputs`.
 - `project.md` default `sync: git`.
@@ -118,3 +119,22 @@ Recorded in detail in the plan's "Revisions after Gate 0" section. Summary:
 ## Claude Code check (2026-09-19)
 
 Headless `claude -p "/done:what-now" --plugin-dir plugins/done` in a temp git repo with a card at `pr #3` and a commit `feat: start (#3)`: git sync matched the ref, set the card done, state-write archived it, state.md v2, plan.md v3, one log line `what-now v2 rule:4 card:M1.2`, output in the §8 shape. init and goals were not run headlessly (the interview and the confirmation gate need a user).
+
+## Remaining after plan Task 13 (2026-09-19)
+
+All 13 plan tasks are done. The plugin is not yet finished against the objective:
+
+1. Nothing since 0.4.0 has run in Cowork (the renamed commands, the sync fixes, the id check). Needs one paid run.
+2. Untested paths:
+   - the `gh` exit-2 fallback
+   - a connector result wrapped in an outer object
+   - `|` inside a cell (known to break parsing, not fixed)
+   - `sync: self-report`
+   - `capacity: none`
+3. No real-project use: `init --from` conversion has never run, and the starwards playbook conversion cost is unmeasured.
+4. Later scope: other planning or prioritizing strategies. Only `agent-fleet` exists.
+5. Small items:
+   - goals could delete the template example card instead of cutting it; cutting it makes the first real card M1.2
+   - does the sandbox-to-Windows path rewrite apply to tool output, or only to what the user sees?
+
+Items 1 and 3 decide whether the plugin is usable. Item 4 is new work.
