@@ -91,3 +91,9 @@ Findings:
 Consequences for `done`:
 - Scripts and commands use `~/mnt/<name>`, never the Windows path.
 - State writes use overwrite or rename and never delete. Then no grant is needed. If a delete is ever required, call `allow_cowork_file_delete` once per session.
+
+Open question: is the output rewrite consistent?
+- The v3 report as pasted to the user shows C3's EPERM with the Windows path.
+- Afterwards, the v3 session's model said its own tool output showed the sandbox path there.
+- The two statements conflict. The rewrite may happen between the tool output and what the user sees, not in the tool output itself. Unresolved; it matters only if a script or model parses paths out of tool output.
+- If `done` ever has to delete, calling `allow_cowork_file_delete` once per session is expected behaviour, not an error.
