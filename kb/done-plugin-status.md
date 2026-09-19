@@ -44,9 +44,9 @@ A second session (claude-arad-c1) reviewed the design. Its accepted points are i
 | PR #9, KB notes + smoke v3 | merged |
 | Smoke v3 | PR #9 merged, released 0.2.2, ran in Cowork |
 | Spec §5/§7/§8 + plan revisions | PR #12 (first commit) |
-| Tasks 2–8, scripts and templates | PR #12 open, 23 tests pass |
-| Tasks 9–12 | not started; wait for PR #12 merge |
-| Task 13, Cowork end-to-end | not started |
+| Tasks 2–8, scripts and templates | PR #12 merged, released `done` 0.3.0 |
+| Tasks 9–12, strategy + skills init/what-now/goals | branch `feat/done-skills`, 24 tests pass; `lib/smoke.mjs` removed |
+| Task 13, Cowork end-to-end | protocol ready: [Cowork e2e protocol](done-cowork-e2e.md); not run |
 
 ## Decisions after smoke v2 (2026-09-19)
 
@@ -104,3 +104,16 @@ Recorded in detail in the plan's "Revisions after Gate 0" section. Summary:
 
 - Checkouts on this Windows host have CRLF working trees (`core.autocrlf=true`). Any parser of `.done/` files must split on `\r?\n`.
 - `node --test <dir>` fails on node v22.13.1 on Windows. Use a `*.test.mjs` glob.
+
+## Build decisions in feat/done-skills (2026-09-19)
+
+- Skills resolve the project root first (spec §8). what-now and goals keep only `~/mnt` candidates that contain `.done/`, so a second selected folder without `.done/` causes no question.
+- Scratch files live in `ROOT/.done/work/` and are overwritten, never deleted. Reason: on Windows, `node` resolves `/tmp` to `C:	mp` while bash resolves it elsewhere; the project folder is writable in both harnesses. Connector raw output stays there as evidence (`merged.json`, `open.json`, `issues.json`).
+- Connector sync: the model saves the item arrays as returned (only an outer wrapper object is unwrapped) so `sync-github.mjs` sees the real shape.
+- Bug found and fixed: `state-write` archived done/ruled cards from plan.md but left their ids in other rows' Blocked on, so the next `cards.mjs validate` failed ("blocked on unknown card"). `guardedWrite` now strips archived ids; test added.
+- Strategy files carry no starwards issue numbers (generic rule); the evidence stays in spec §2.
+- The plan template ships an example card M1.1, so a fresh init routes it (rule 3) until goals replaces it.
+
+## Claude Code check (2026-09-19)
+
+Headless `claude -p "/done:what-now" --plugin-dir plugins/done` in a temp git repo with a card at `pr #3` and a commit `feat: start (#3)`: git sync matched the ref, set the card done, state-write archived it, state.md v2, plan.md v3, one log line `what-now v2 rule:4 card:M1.2`, output in the §8 shape. init and goals were not run headlessly (the interview and the confirmation gate need a user).

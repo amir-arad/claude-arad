@@ -20,7 +20,15 @@ export function guardedWrite({ file, expectVersion, content, root, date }) {
       drop.add(c.line - 1); archived.push(c.id);
       logLines.push(`- ${date} archive card:${c.id} ${c.status.kind} ${c.status.ref} — ${c.action}`);
     }
-    body = body.split(/\r?\n/).filter((_, i) => !drop.has(i)).join('\n');
+    // Archived cards leave the plan, so drop them from other rows' Blocked on or the plan stops validating.
+    const gone = new Set(archived);
+    const fix = new Set(plan.milestones.flatMap((m) => m.cards).filter((c) => c.blockedOn.some((b) => b.kind === 'card' && gone.has(b.ref))).map((c) => c.line - 1));
+    body = body.split(/\r?\n/).map((l, i) => {
+      if (!fix.has(i)) return l;
+      const c = l.split('|');  // ['', Card, Action, Mode, Owner, Blocked on, Status, '']
+      c[5] = ' ' + c[5].split(',').map((s) => s.trim()).filter((s) => s && !gone.has(s)).join(', ') + ' ';
+      return c.join('|');
+    }).filter((_, i) => !drop.has(i)).join('\n');
   }
   if (base === 'state.md') {
     // A watch item ticked this run stays visible once; it is dropped when it was already ticked in the file on disk.

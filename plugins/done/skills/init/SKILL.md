@@ -1,61 +1,66 @@
 ---
 name: init
-description: Smoke check for the done plugin (temporary). Probes plugin paths, the selected project folder, shell/node/Write-tool writes, git, and GitHub access. Replaced by the real init in a later release.
+description: Create .done/ at the project root and fill project.md through a short interview. Idempotent; never overwrites. Optionally converts an existing plan file into the card grammar.
+argument-hint: "[root] [--from <legacy plan path>]"
 disable-model-invocation: true
 ---
 
-# init (smoke v3)
+# init
 
-Report each check as one line, `<id> <check>: <result>`. Paste command output verbatim (trim to 300 chars per line). Do not interpret, do not fix, do not skip a check because an earlier one failed. If a command is refused or blocked, report the exact refusal text. Run everything; ask nothing, except in check B1.
+`LIB` = `${CLAUDE_SKILL_DIR}/../../lib`, `ASSETS` = `${CLAUDE_SKILL_DIR}/../../assets`. Write these paths out in full in every command.
 
-## A. Plugin paths
+## 0. Project root → `ROOT`
 
-- A1 skill-dir text: copy verbatim the text between the brackets: [${CLAUDE_SKILL_DIR}]
-- A2 plugin-root text: copy verbatim: [${CLAUDE_PLUGIN_ROOT}]
-- A3 skill-dir ls: `ls "${CLAUDE_SKILL_DIR}/../../.claude-plugin/plugin.json"`. Also report the exact command string the shell tool actually received, if visible to you.
-- A4 plugin-root ls: `ls "${CLAUDE_PLUGIN_ROOT}/lib/smoke.mjs"`
-- A5 cat via placeholder: `head -3 "${CLAUDE_SKILL_DIR}/../../.claude-plugin/plugin.json"`
-- A6 Read tool via placeholder: use your file-read tool (not the shell) on `${CLAUDE_SKILL_DIR}/../../.claude-plugin/plugin.json`; report the `"version"` value or the error.
-- A7 node via placeholder, no arg: `node "${CLAUDE_SKILL_DIR}/../../lib/smoke.mjs"`; report every line.
-- A8 invocation: did you receive this skill via the Skill tool, a slash command typed by the user, or other? Report what you know; `unknown` if unsure.
+- A root given as the first token of `$ARGUMENTS` wins.
+- Cowork (`~/mnt/` exists): `ls -a ~/mnt`. Candidates are entries other than `outputs`, `uploads` and dot-dirs. One → `ROOT=~/mnt/<it>`. Several → list them and ask which. None → call the cowork directory-request tool (`request_cowork_directory`), then re-list. Never use the session home, `~/mnt/outputs`, or the folder's Windows path (bash cannot resolve it).
+- Otherwise (Claude Code): `git rev-parse --show-toplevel`, else the current directory.
 
-## B. Project folder
+State `ROOT` in one line before writing anything.
 
-- B1 selected folder: `ls -la ~/mnt 2>&1; pwd; echo "HOME=$HOME"`. Report output. If no user-selected folder exists under `~/mnt` (anything other than `outputs`, `uploads`, `.remote-plugins`, `.projects`, `.claude`), request one with the cowork directory tool, then rerun. Report the tool name used or `not needed`.
-- B2 folder path: absolute sandbox path of the selected folder, as P. If more than one candidate, list all and use the one the user selected. All later checks use P.
-- B3 folder facts: `ls -la "P" | head -20; stat -c '%U:%G %a' "P"; df -h "P" | tail -1`
-- B4 mount line: `mount | grep -F "$(basename "P")" || echo none`
+## 1. Scaffold (*script*)
 
-## C. Writes into P (clean up after each)
+```
+node ${CLAUDE_SKILL_DIR}/../../lib/init-scaffold.mjs "ROOT" --json
+```
 
-- C1 shell write: `mkdir -p "P/.done-smoke-sh" && echo ok > "P/.done-smoke-sh/a.txt" && cat "P/.done-smoke-sh/a.txt"`
-- C2 shell delete: `rm -r "P/.done-smoke-sh" && echo deleted; ls -a "P" | grep done-smoke || echo gone`
-- C3 node write+delete: `node "${CLAUDE_SKILL_DIR}/../../lib/smoke.mjs" "P"`; report every line.
-- C4 Write tool: with your file-write tool create `P/.done-smoke-write/b.md` containing `ok`. Then shell `cat "P/.done-smoke-write/b.md"`.
-- C5 cleanup of C4: `rm -r "P/.done-smoke-write" && echo deleted`. If denied, report the text, then call the cowork delete-permission tool if one exists, retry, and report both results.
-- C6 leftovers: `ls -a "P" | grep done-smoke || echo none`
+Report `created` and `already_present`. Exit 2 → report the refusal and stop.
+Manual (no `node`): for `project`, `plan`, `state`, `decisions`, copy `ASSETS/<name>-template.md` to `ROOT/.done/<name>.md` unless it exists. Create `ROOT/.done/log.md` unless it exists, with the `LOG_HEADER` text from `LIB/log-append.mjs` followed by `- <YYYY-MM-DD> init v1 manual: rule:- card:- scaffolded .done/`. Never overwrite an existing file.
 
-## D. Git in P
+## 2. Interview — one question at a time; stop when project.md is complete
 
-- D1 repo: `git -C "P" rev-parse --show-toplevel 2>&1`
-- D2 log: `git -C "P" log --oneline -3 2>&1`
-- D3 status: `git -C "P" status --short 2>&1 | head -5; ls "P/.git/"*.lock 2>&1`
-- D4 remote: `git -C "P" remote -v 2>&1 | head -2`
-- D5 fetch: `timeout 20 git -C "P" fetch --dry-run 2>&1 | head -3; echo exit=$?`
-- D6 locks after: `ls "P/.git/"*.lock 2>&1 || echo none`
+Skip any question whose answer is already in `ROOT/.done/project.md`. Order:
 
-## E. GitHub access
+1. Project name, and the goal in one sentence. (→ `name`, `## Goal`)
+2. Where is progress visible? Local git only, GitHub issues and PRs, or nowhere (you tell me each run)? (→ `sync: git | github | self-report`; github → `sync.repo: owner/repo`)
+3. If GitHub: which label means "ready for a worker", which "in progress"? (→ `sync.labels.ready`, `sync.labels.in_progress`)
+4. Who does work besides you: agents, people, nobody? (→ `capacity: agents | people | none`)
+5. If agents or people: how many should be busy at once? (→ `thresholds.max_in_flight`)
+6. Which files or surfaces must this plugin never edit? (→ `never`, comma-separated)
 
-- E1 gh: `gh --version 2>&1 | head -1`
-- E2 https: `curl -sS -o /dev/null -w '%{http_code}' --max-time 15 https://api.github.com/ 2>&1`
-- E3 connector tools: list the names of every tool available to you whose name contains `github` (case-insensitive), including deferred ones. Names only, or `none`.
-- E4 connector call: if E3 found a tool that reads the authenticated user or lists pull requests, call it once for the repo in D4 (or the authenticated user if no remote). Report `ok` plus one fact (e.g. open PR count), or the error. Do not write anything.
+Edit only the lines inside the fenced block of project.md and the `## Goal` paragraph; keep the FORMAT CONTRACT comment. `strategy: agent-fleet` (the only one shipped). Do not ask about gates or `rebase_after`; defaults apply until the user edits project.md.
 
-## F. Environment
+## 3. Legacy plan conversion (only with `--from <path>`)
 
-- F1 tools: `node --version; npm --version; git --version; python3 --version 2>&1`
-- F2 env: `env | grep -i -E 'claude|plugin|skill' | cut -c1-200`
-- F3 identity: `id; umask; date -Is; echo TZ=$TZ`
-- F4 cowork tools: list names of every tool whose name contains `cowork`, including deferred ones.
+Read the file. For every table row or list item that is a unit of work, draft one card in the grammar at the top of `ASSETS/plan-template.md`:
+- Struck (`~~`) or done rows → omit; list them in the reply as "already done, not carried over".
+- Free-text "Blocked on" → `ext:<text>`; tell the user so they can replace it with a card id.
+- Unknown mode → nearest of DECIDE / DISPATCH / REVIEW / QA / DO; say which you guessed.
+- Rulings found inline → one line each in `ROOT/.done/decisions.md`.
 
-End with the single line `smoke v3 done`.
+Write the draft to `ROOT/.done/work/plan.md`, then:
+
+```
+node ${CLAUDE_SKILL_DIR}/../../lib/cards.mjs validate "ROOT/.done/work/plan.md"
+```
+
+Fix what it lists and re-run until `ok`. Then install it (plan.md from the scaffold is version 1):
+
+```
+node ${CLAUDE_SKILL_DIR}/../../lib/state-write.mjs "ROOT/.done/plan.md" --expect-version 1 --from "ROOT/.done/work/plan.md" --root "ROOT" --json
+```
+
+Manual: check each row against the grammar by hand, write plan.md directly, and say `manual:` in the report.
+
+## 4. Report
+
+Root, files created / present, the project.md block as written, cards converted (count) and rows dropped. `.done/work/` holds scratch files; suggest adding it to `.gitignore`. End with: `Run /done:what-now`. Nothing is committed.

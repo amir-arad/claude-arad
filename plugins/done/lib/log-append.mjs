@@ -2,7 +2,7 @@
 import fs from 'node:fs'; import path from 'node:path';
 import { parseArgs, fail, emit, isMain, todayIso, doneDir, exists } from './lib.mjs';
 
-const LOG_HEADER = `<!-- FORMAT CONTRACT (done plugin)\nAppend-only. Written only by lib/log-append.mjs and lib/state-write.mjs. One line per run:\n- YYYY-MM-DD <run> v<N> [manual: ]<rule:k | deviation:"reason"> card:<id> <one line>\n-->\n# Log\n\n`;
+const LOG_HEADER = `<!-- FORMAT CONTRACT (done plugin)\nAppend-only. Written only by lib/log-append.mjs and lib/state-write.mjs. One line per run:\n- YYYY-MM-DD <run> v<N> [manual: ]<rule:k | deviation:"reason"> card:<id> <one line>\nv<N> is the version the run wrote: state.md for what-now, plan.md for goals, 1 for init.\n-->\n# Log\n\n`;
 
 export function formatLogLine({ date, run, version, rule, deviation, card, text, manual = false }) {
   if (/[\r\n]/.test(text)) throw new Error('log text must not contain a newline');

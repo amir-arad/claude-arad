@@ -33,6 +33,7 @@ Gate 0 ran (smoke v2, v3, fresh session; kb/cowork-smoke-v3-results.md). Spec §
 - Task 7: `guardedWrite` writes via `writeAtomic`.
 - Task 10: init resolves the project root per spec §8 before scaffolding.
 - Task 11: sync step per spec §5 step 2.
+- Tasks 10–12 (as built): skills write scratch files to `ROOT/.done/work/`, not `/tmp`. `state-write` also strips archived card ids from other rows' Blocked on. Task 13 protocol: kb/done-cowork-e2e.md.
 
 ## Global Constraints
 
