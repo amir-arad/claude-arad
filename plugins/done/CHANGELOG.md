@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/amir-arad/claude-arad/compare/done-v0.3.0...done-v0.4.0) (2026-09-19)
+
+
+### Features
+
+* **done:** skills init, what-now, goals and agent-fleet strategy ([#14](https://github.com/amir-arad/claude-arad/issues/14)) ([d9d28e6](https://github.com/amir-arad/claude-arad/commit/d9d28e6780dbb936ce9ca727a35ab3bdbdad6a92))
+
 ## [0.3.0](https://github.com/amir-arad/claude-arad/compare/done-v0.2.2...done-v0.3.0) (2026-09-19)
 
 
