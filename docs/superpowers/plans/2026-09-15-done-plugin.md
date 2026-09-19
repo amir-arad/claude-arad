@@ -18,7 +18,12 @@
 ## Revisions after Gate 0 (2026-09-19)
 
 Gate 0 ran (smoke v2, v3, fresh session; kb/cowork-smoke-v3-results.md). Spec §5, §7, §8 updated. Deltas that override the task text below:
-- Task 1: done (PRs #5, #7, #9; `done` 0.2.2). The init stub is smoke v3 plus `lib/smoke.mjs`; Task 8 deletes `smoke.mjs`, Task 10 replaces the stub.
+- Task 1: done (PRs #5, #7, #9; `done` 0.2.2). The init stub is smoke v3 plus `lib/smoke.mjs`; Task 10 replaces the stub and removes `smoke.mjs`.
+- Tests run as `node --test plugins/done/test/*.test.mjs` (node 22 on Windows rejects a directory argument).
+- Task 4: `derive().done` includes `ruled` cards (settled, archived like done). Parsers split on `?
+`.
+- Task 7: the log is appended after the write succeeds. `state.md`: drop only watch items already ticked in the file on disk.
+- Task 8: also refuses the home directory and `~/mnt/outputs`.
 - Decision table result: placeholders substituted, node present, `gh` absent → script steps primary.
 - Task 2: `parseProject` accepts `sync: git | github | self-report`; default `git`. Add `writeAtomic(file, text)` (temp file in the same dir + `renameSync`); every script write uses it or `appendFileSync`. No script calls `unlink`/`rm`.
 - Task 3: project template `sync: git`.
