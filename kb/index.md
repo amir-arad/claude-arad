@@ -25,6 +25,7 @@ Hub for `claude-arad`. One entry per doc; link text carries a word from the doc'
 - [Cowork sandbox environment facts](cowork-sandbox-environment.md) — probe of the Cowork Linux sandbox: shell, tools, proxy, `~/mnt` folders and their write permissions, plugin location on disk, cowork tools.
 - [Skill placeholders `${CLAUDE_SKILL_DIR}` and `${CLAUDE_PLUGIN_ROOT}` in Cowork](skill-placeholders-unset-in-cowork.md) — smoke v1 (shell variable, empty) vs v2 (substituted to the Windows host path), the system-prompt wording, where the plugin actually was.
 - [Cowork smoke v3 results](cowork-smoke-v3-results.md) — done 0.2.2 in Cowork: placeholder paths for the shell, node and the Read tool, the selected-folder mount, writes versus deletes, git, GitHub proxy block, connector tool naming.
+- [Cowork raw run outputs, 2026-09-19](cowork-raw-runs-2026-09-19.md) — verbatim pastes: smoke v2 rerun, GitHub connector report, smoke v3, post-grant follow-up, fresh-session script and output.
 
 ## Reference
 

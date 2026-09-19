@@ -42,7 +42,7 @@ Source: observed 2026-09-19 — `done:init` smoke.
 
 ## Cowork sandbox facts a plugin script may depend on
 
-Node 22 / npm 10 / Python 3.10 / git 2.34 present, `gh` absent; `~/mnt/outputs` allows create but not delete; `~/mnt/uploads` read-only; all egress via authenticated localhost proxy; no repo reachable until a folder is selected. Selected folder at `~/mnt/<name>` (cwd is the session home): create, overwrite and rename ok, delete needs `allow_cowork_file_delete` per session. GitHub is blocked by the proxy (403, SSH fetch fails); use the GitHub MCP connector, whose tools are named `mcp__<uuid>__*`.
+Node 22 / npm 10 / Python 3.10 / git 2.34 present, `gh` absent; `~/mnt/outputs` allows create but not delete; `~/mnt/uploads` read-only; all egress via authenticated localhost proxy; no repo reachable until a folder is selected. Selected folder at `~/mnt/<name>` (cwd is the session home): create, overwrite and rename ok, delete needs `allow_cowork_file_delete` per session. GitHub is blocked by the proxy (403, SSH fetch fails); use the GitHub MCP connector, whose tools are named `mcp__<uuid>__*`. Cowork git reports host CRLF files as modified; see [smoke v3 results](cowork-smoke-v3-results.md).
 Full record: [Cowork sandbox environment](cowork-sandbox-environment.md).
 Source: observed 2026-09-19 — environment probe.
 

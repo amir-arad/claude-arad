@@ -97,3 +97,13 @@ Open question: is the output rewrite consistent?
 - Afterwards, the v3 session's model said its own tool output showed the sandbox path there.
 - The two statements conflict. The rewrite may happen between the tool output and what the user sees, not in the tool output itself. Unresolved; it matters only if a script or model parses paths out of tool output.
 - If `done` ever has to delete, calling `allow_cowork_file_delete` once per session is expected behaviour, not an error.
+
+## Line endings: Cowork git reports CRLF files as modified
+
+- Smoke v3 D3 showed ` M` on `marketplace.json`, `.garden/*`, `release.yml` and `.gitignore`.
+- The same working tree was clean in Claude Code on the Windows host.
+- Host check: `git ls-files --eol` gives `i/lf w/crlf` for those files, with `core.autocrlf=true` on the host and no `.gitattributes`.
+- Inference: Cowork's Linux git does not use the host's autocrlf and treats the CRLF working-tree files as changed. A commit made from Cowork could turn every such file into a CRLF diff.
+- Consequence for `done`: `git status` in Cowork overstates changes. Sync should rely on `git log`, not the dirty list. Adding `.gitattributes` (`* text=auto`) to a project might remove the effect (untested).
+
+Raw outputs: [Cowork raw run outputs](cowork-raw-runs-2026-09-19.md).
