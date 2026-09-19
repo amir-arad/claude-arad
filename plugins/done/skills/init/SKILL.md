@@ -1,18 +1,20 @@
 ---
 name: init
-description: Smoke check for the done plugin (temporary). Prints the skill directory and tool availability. Replaced by the real init in the next release.
+description: Smoke check for the done plugin (temporary). Reports how the plugin's own path reaches the skill, and tool availability. Replaced by the real init in a later release.
 disable-model-invocation: true
 ---
 
-# init (smoke)
+# init (smoke v2)
 
-Run each command and report its exact output, one line each. Do not interpret, do not fix.
+Report each check as one line, `<check>: <result>`. Do not interpret, do not fix, nothing else.
 
-1. `echo "$CLAUDE_SKILL_DIR"` — expected: an absolute path ending in `skills/init`. If empty, say `CLAUDE_SKILL_DIR: unset`.
-2. `ls "$CLAUDE_SKILL_DIR/../../.claude-plugin/plugin.json"` — expected: the path. If missing, say so.
-3. `node --version` — or `node: absent`.
-4. `gh --version | head -1` — or `gh: absent`.
-5. `git --version` — or `git: absent`.
-6. `pwd` and `ls -a` of the working directory.
-
-Output format: six lines, `<check>: <result>`. Nothing else.
+1. skill-dir text: copy verbatim the text between the brackets: [${CLAUDE_SKILL_DIR}]
+2. plugin-root text: copy verbatim the text between the brackets: [${CLAUDE_PLUGIN_ROOT}]
+3. skill-dir ls: run `ls "${CLAUDE_SKILL_DIR}/../../.claude-plugin/plugin.json"` and report output or error.
+4. plugin-root ls: run `ls "${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json"` and report output or error.
+5. env: run `env | grep -i -E 'claude|plugin|skill' | cut -c1-200` and report every line (or `none`).
+6. find: run `find / -path '*done*' -name plugin.json 2>/dev/null | head -5` and report every line (or `none`).
+7. node: `node --version` or `absent`.
+8. gh: `gh --version | head -1` or `absent`.
+9. git: `git --version` or `absent`.
+10. cwd: `pwd`.
