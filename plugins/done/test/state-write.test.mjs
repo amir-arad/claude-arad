@@ -58,3 +58,13 @@ test('keeps a watch item ticked this run, leaves no temp file', () => {
   assert.ok(fs.readFileSync(f, 'utf8').includes('[x] new'));
   assert.deepEqual(fs.readdirSync(dir), ['state.md']);
 });
+
+test('unblocking keeps an escaped pipe in another cell intact', () => {
+  const root = tmp(); const dir = path.join(root, '.done'); fs.mkdirSync(dir);
+  const f = path.join(dir, 'plan.md');
+  const plan = `<!-- version: 1 -->\n# Plan\n\n## M1 — A\n| Card | Action | Mode | Owner | Blocked on | Status |\n|---|---|---|---|---|---|\n| M1.1 | pick | DECIDE |  |  | ruled 2026-09-14 |\n| M1.2 | a \\| b | DO |  | M1.1 | open |\n`;
+  fs.writeFileSync(f, plan);
+  assert.equal(guardedWrite({ file: f, expectVersion: 1, content: plan, root, date: '2026-09-15' }).ok, true);
+  const card = parsePlan(fs.readFileSync(f, 'utf8')).milestones[0].cards[0];
+  assert.equal(card.action, 'a | b'); assert.deepEqual(card.blockedOn, []);
+});

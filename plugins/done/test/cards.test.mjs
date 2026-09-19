@@ -81,3 +81,9 @@ test('retiredProblems rejects a card id archived in log.md', () => {
   assert.match(retiredProblems(plan, log).join('\n'), /M1\.1 reuses an archived card id/);
   assert.deepEqual(retiredProblems(plan, '- 2026-09-19 archive card:M1.10 done x — y\n'), []);
 });
+
+test('parsePlan reads an escaped pipe inside a cell as text', () => {
+  const plan = parsePlan('## M1 — A\n| Card | Action | Mode | Owner | Blocked on | Status |\n|---|---|---|---|---|---|\n| M1.1 | pick MIT \\| Apache | DECIDE |  |  | open |\n');
+  assert.deepEqual(plan.problems, []);
+  assert.equal(plan.milestones[0].cards[0].action, 'pick MIT | Apache');
+});

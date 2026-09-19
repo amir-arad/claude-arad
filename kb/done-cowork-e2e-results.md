@@ -46,3 +46,4 @@ Unknown: whether the connector itself returns this trimmed field set, or the mod
   - the `gh` exit-2 fallback
   - a connector result wrapped in an outer object
   - a `|` inside a cell
+  - Update: the `gh` fallback was checked on the host, and the wrapped result and `|` were fixed in code ([status](done-plugin-status.md), fix/done-pre-e2e-2).

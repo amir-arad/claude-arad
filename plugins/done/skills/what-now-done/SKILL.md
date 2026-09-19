@@ -69,7 +69,7 @@ node ${CLAUDE_SKILL_DIR}/../../lib/cards.mjs validate "PLAN" --log "ROOT/.done/l
 node ${CLAUDE_SKILL_DIR}/../../lib/cards.mjs derive "PLAN" --json
 node ${CLAUDE_SKILL_DIR}/../../lib/counts.mjs "PLAN" --project "ROOT/.done/project.md" [--facts "ROOT/.done/work/github.json"] --json
 ```
-Validation exit 2 → fix the rows it names (your step-3 edits), re-run. Pass `--facts` only when a `sync-github.mjs` call in this run's step 2b exited 0 (a failed call leaves `github.json` empty, and an earlier run's file may be stale).
+Validation exit 2 → if every problem is in a row you edited in step 3, fix those rows and re-run. A problem in a row you did not edit → show the problems, say `Plan invalid: run /done:goals-done reconcile`, and stop without writing anything. Pass `--facts` only when a `sync-github.mjs` call in this run's step 2b exited 0 (a failed call leaves `github.json` empty, and an earlier run's file may be stale).
 Manual: READY NOW = open cards whose card blockers are all done/ruled and with no `ext:`/`owner:` blocker; IN FLIGHT = `dispatched`/`pr`; AWAITING GATE = `pr`; DECIDE order = ready DECIDE cards by number of cards transitively blocked on them, descending, then plan order.
 
 ## 5. Route

@@ -47,3 +47,18 @@ test('CLI --from-dir rejects raw files not saved by this run', () => {
   fs.utimesSync(path.join(dir, 'merged.json'), new Date(), new Date());
   assert.equal(spawnSync(process.execPath, [path.join(here, '..', 'lib', 'sync-github.mjs'), '--from-dir', dir, '--repo', 'o/r'], { encoding: 'utf8' }).status, 0);
 });
+
+test('CLI --from-dir unwraps a connector result wrapped in an object', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'done-gh-'));
+  const pr = { number: 5, title: 't', state: 'open', user: { login: 'a' }, labels: [], head: { ref: 'b' }, updated_at: '2026-09-19T00:00:00Z' };
+  fs.writeFileSync(path.join(dir, 'merged.json'), '[]');
+  fs.writeFileSync(path.join(dir, 'open.json'), JSON.stringify({ total_count: 1, items: [pr] }));
+  fs.writeFileSync(path.join(dir, 'issues.json'), JSON.stringify({ total_count: 0 }));
+  const run = () => spawnSync(process.execPath, [path.join(here, '..', 'lib', 'sync-github.mjs'), '--from-dir', dir, '--repo', 'o/r'], { encoding: 'utf8' });
+  let r = run();
+  assert.equal(r.status, 1); assert.match(r.stderr, /issues\.json.*array/);
+  fs.writeFileSync(path.join(dir, 'issues.json'), '{"issues": []}');
+  r = run();
+  assert.equal(r.status, 0, r.stderr);
+  assert.deepEqual(JSON.parse(r.stdout).openPrs.map((p) => p.number), [5]);
+});

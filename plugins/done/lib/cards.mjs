@@ -5,10 +5,12 @@ export const CARD_ID = /^[A-Za-z]+\d+\.\d+$/;
 export const MILESTONE_HEAD = /^## ([A-Za-z]+\d+) — (.+)$/;
 export const MODES = ['DECIDE', 'DISPATCH', 'REVIEW', 'QA', 'DO'];
 const STATUS_RE = /^(open|filed #(\d+)|dispatched #(\d+)|pr #(\d+)|ruled (\d{4}-\d{2}-\d{2})|done (\d{4}-\d{2}-\d{2}))$/;
+// A literal | inside a cell is written \| (GitHub table syntax).
+export const CELL_SPLIT = /(?<!\\)\|/;
 const HEADER = ['Card', 'Action', 'Mode', 'Owner', 'Blocked on', 'Status'];
 
 function cells(line) {
-  return line.trim().replace(/^\||\|$/g, '').split('|').map((s) => s.trim());
+  return line.trim().replace(/^\||\|$/g, '').split(CELL_SPLIT).map((s) => s.trim().replace(/\\\|/g, '|'));
 }
 
 export function parsePlan(text) {

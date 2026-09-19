@@ -138,3 +138,22 @@ All 13 plan tasks are done. The plugin is not yet finished against the objective
    - does the sandbox-to-Windows path rewrite apply to tool output, or only to what the user sees?
 
 Items 1 and 3 decide whether the plugin is usable. Item 4 is new work.
+
+## Fixes before the second Cowork run (fix/done-pre-e2e-2, 2026-09-19)
+
+- **`|` in a cell**: previously the row failed with `expected 6 cells, got 7`. Now `\|` is the escape (GitHub table syntax). `cards.mjs` splits cells on unescaped pipes and unescapes them; `state-write` uses the same split when it rewrites Blocked on. The plan template grammar says so. Tests added.
+- **Wrapped connector result**: `buildFacts` would have crashed on `.map` of an object. `sync-github --from-dir` now takes the only array property of a wrapping object (e.g. `{"total_count":1,"items":[...]}`). An object with zero or several arrays → exit 1, `must be a JSON array...`. Test added. The skill's "unwrap it yourself" instruction stays.
+- **what-now on a plan that is already invalid**: the old text ("fix the rows it names (your step-3 edits)") did not cover problems in rows the run did not edit, such as the M1.1 reuse left by the first e2e. Now: show the problems, say `Plan invalid: run /done:goals-done reconcile`, and write nothing.
+- **Template card**: goals deletes the template's example row (Action `Replace me`) instead of cutting it, so the first real card is M1.1.
+- 32 tests pass.
+
+## `gh` exit-2 fallback: checked on the host (2026-09-19)
+
+Headless `claude -p "/done:what-now-done" --plugin-dir plugins/done` in a temp git repo, with `sync: github`, repo `amir-arad/claude-arad`, `capacity: none`, and gh logged out (`GH_CONFIG_DIR` pointing to an empty dir, `GH_TOKEN` and `GITHUB_TOKEN` empty).
+- `sync-github` exited 2 with `gh unavailable: To get started with GitHub CLI...`. The model then called the claude.ai GitHub connector (`mcp__claude_ai_github_copilot__list_pull_requests` twice, `list_issues` once), saved `merged.json` (19 PRs), `open.json` and `issues.json`, and `--from-dir` exited 0. State went to v2, with one log line.
+- Evidence: in Claude Code, claude.ai connectors are loaded in `-p` runs, so path 2 is reachable there too.
+- The model deviated from rule 3 on the template card M1.1: "placeholder, no decision to packet, route to goals". It logged this as `deviation:`. That is acceptable per the ladder's deviation rule.
+- Harness gotcha: on this host, Claude Code runs shell commands with the **PowerShell** tool. The first attempt allowlisted only `Bash(node:*)`, so every script was blocked and the model fell back to manual steps. Allow `PowerShell` in headless runs.
+- `capacity: none` caused no error. Nothing in that run depended on it.
+
+The next Cowork run is designed in [done-cowork-e2e-2.md](done-cowork-e2e-2.md).

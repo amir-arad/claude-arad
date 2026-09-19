@@ -54,7 +54,13 @@ function fromDir(dir, name) {
   const text = readText(file);
   if (text === null) fail(`missing ${file}`, 1);
   if (Date.now() - fs.statSync(file).mtimeMs > MAX_AGE) fail(`stale ${file}: save it again from the connector in this run`, 3);
-  try { return JSON.parse(text); } catch (e) { fail(`${name} is not JSON: ${e.message}`, 1); }
+  let data;
+  try { data = JSON.parse(text); } catch (e) { fail(`${name} is not JSON: ${e.message}`, 1); }
+  if (Array.isArray(data)) return data;
+  // A connector may wrap the list, e.g. {"total_count": 3, "items": [...]}: take its only array property.
+  const arrays = data && typeof data === 'object' ? Object.values(data).filter(Array.isArray) : [];
+  if (arrays.length !== 1) fail(`${name} must be a JSON array, or an object with exactly one array property`, 1);
+  return arrays[0];
 }
 
 const HELP = `sync-github.mjs — GitHub facts for /done:what-now-done.
