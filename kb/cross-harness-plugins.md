@@ -74,6 +74,8 @@ Per-project state belongs in a user-selected folder.
 
 helios `CLAUDE.md` (2026-09-04): in a Cowork-mounted repo, git strands `.git/*.lock` unless `mcp__cowork__allow_cowork_file_delete` is granted first.
 
+Smoke v3: `rev-parse`, `log`, `status` and `remote` in the selected folder left no `.git/*.lock`. Inference: git removes a lock file by deleting it, and deletes are blocked before the grant, which would explain stranded locks. Only read-only git was tested; commit and checkout are untested.
+
 ## Frontmatter
 
 `name`, `description`, `disable-model-invocation: true` and `argument-hint` work in Cowork (`done:init`) and Claude Code (`garden`). Other fields are untested in Cowork.

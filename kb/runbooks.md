@@ -35,14 +35,14 @@ Source: documented — `CLAUDE.md`.
 
 ## `${CLAUDE_SKILL_DIR}` / `${CLAUDE_PLUGIN_ROOT}` are empty in a skill's shell command
 
-Cause: they are text substitutions in the SKILL.md body, not environment variables. `$CLAUDE_SKILL_DIR` in a shell is empty. Write `${CLAUDE_SKILL_DIR}`. Cowork substitutes the Windows host path.
+Cause: they are text substitutions in the SKILL.md body, not environment variables. `$CLAUDE_SKILL_DIR` in a shell is empty. Write `${CLAUDE_SKILL_DIR}`. Cowork substitutes the Windows host path. Plugin paths from placeholders resolve for the shell, node and the Read tool. The project folder's Windows path does not; use `~/mnt/<name>`. See [smoke v3 results](cowork-smoke-v3-results.md).
 Fallback: the plugin tree is at `~/mnt/.remote-plugins/plugin_<id>/`, read-only; the id matches the Windows base-directory path in the skill header.
 Full record: [skill placeholders in Cowork](skill-placeholders-unset-in-cowork.md). Practice for both harnesses: [cross-harness plugins](cross-harness-plugins.md).
 Source: observed 2026-09-19 — `done:init` smoke.
 
 ## Cowork sandbox facts a plugin script may depend on
 
-Node 22 / npm 10 / Python 3.10 / git 2.34 present, `gh` absent; `~/mnt/outputs` allows create but not delete; `~/mnt/uploads` read-only; all egress via authenticated localhost proxy; no repo reachable until a folder is selected.
+Node 22 / npm 10 / Python 3.10 / git 2.34 present, `gh` absent; `~/mnt/outputs` allows create but not delete; `~/mnt/uploads` read-only; all egress via authenticated localhost proxy; no repo reachable until a folder is selected. Selected folder at `~/mnt/<name>` (cwd is the session home): create, overwrite and rename ok, delete needs `allow_cowork_file_delete` per session. GitHub is blocked by the proxy (403, SSH fetch fails); use the GitHub MCP connector, whose tools are named `mcp__<uuid>__*`.
 Full record: [Cowork sandbox environment](cowork-sandbox-environment.md).
 Source: observed 2026-09-19 — environment probe.
 

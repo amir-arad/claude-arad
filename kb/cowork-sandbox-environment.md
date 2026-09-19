@@ -33,7 +33,7 @@ What the Cowork (Claude desktop) Linux sandbox looked like when probed on 2026-0
 
 ## Mounts and folders
 
-`mount` shows `/` (ext4) and `/sessions` (ext4, `/dev/sdc`) plus tmpfs; no separate mount appears for anything under `~/mnt` (no virtiofs/fuse line). `/mnt` on the host side holds only `.virtiofs-root/` (owned by `nobody`, mode 700).
+`mount` shows `/` (ext4) and `/sessions` (ext4, `/dev/sdc`) plus tmpfs; no separate mount appears for anything under `~/mnt` (no virtiofs/fuse line). `/mnt` on the host side holds only `.virtiofs-root/` (owned by `nobody`, mode 700). Later runs (smoke v3) found that a selected folder has its own fuse mount; see [smoke v3 results](cowork-smoke-v3-results.md).
 
 `~/mnt/` contents:
 
@@ -44,7 +44,7 @@ What the Cowork (Claude desktop) Linux sandbox looked like when probed on 2026-0
 | `.remote-plugins/plugin_<id>/` | `nobody` parent; plugin tree `dr-x------` / `-r-x------` | read-only |
 | `.projects/<project-uuid>/` | `docs/`, `files/`, `metadata.json` (name, description, synced_at) | read-only |
 | `.claude/` | `nobody:nogroup` | not probed |
-| `<selected-folder-name>/` | appears only after `mcp__cowork__request_cowork_directory` | writable (files were written there in this session via Write/Edit, not via bash) |
+| `<selected-folder-name>/` | appears only after `mcp__cowork__request_cowork_directory` | create, overwrite and rename ok for shell, node and Write; `rm` denied until `mcp__cowork__allow_cowork_file_delete`, per session. See [smoke v3 results](cowork-smoke-v3-results.md) |
 
 Before a folder is selected, no repository is reachable from the sandbox; `outputs/` is Cowork's per-session output directory, not a project folder.
 

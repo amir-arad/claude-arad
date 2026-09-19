@@ -29,7 +29,7 @@ Result: the Cowork shell has no path environment variable. v1 tested nothing abo
 
 Result: both placeholders are substituted, to the Windows host path.
 
-Unknown: what mapped the host path to the sandbox path. It was either the shell tool or the model rewriting the command.
+Smoke v3 update: plugin-path input is rewritten to the sandbox path, and the project folder's Windows path is not (bash cannot resolve it). See [smoke v3 results](cowork-smoke-v3-results.md).
 
 ## Cowork system prompt, `<skills_instructions>`
 
@@ -41,9 +41,9 @@ Unknown: what mapped the host path to the sandbox path. It was either the shell 
 
 ## Not tested
 
-- Skill-tool route versus slash form.
+- Skill-tool route versus slash form: the slash form goes through the Skill tool (smoke v3 A8). Invoking from the model is untested.
 - v2 in Claude Code CLI.
-- Host-to-sandbox mapping for `node <path>` and for the Read tool (smoke v3 A6, A7).
+- ~~Host-to-sandbox mapping for `node <path>` and the Read tool~~: works (smoke v3 A6, A7).
 
 ## Smoke v2 rerun
 

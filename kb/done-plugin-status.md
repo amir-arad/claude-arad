@@ -77,7 +77,7 @@ Also: bash cannot resolve the folder's Windows path, so use `~/mnt/<name>`. Outp
 
 ## Open risks
 
-- Untested whether invoking through the Skill tool behaves differently from the `/done:init` slash form.
+- Typing `/done:init` goes through the Skill tool: a hook reported `Skill "done:init" was invoked` (smoke v3 A8). Invoking from the model without the slash command is untested.
 - Ladder rule 1's precedence rests on one PR-rot episode (playbook v94).
 - The strict card grammar rejects the current starwards playbook. Conversion cost is unmeasured.
 - The self-report and `capacity: none` paths have no real-project evidence.
