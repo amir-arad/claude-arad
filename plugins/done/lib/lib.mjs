@@ -64,7 +64,7 @@ const NUMERIC = /^-?\d+(\.\d+)?$/;
 export function parseProject(text) {
   const block = /```\r?\n([\s\S]*?)```/.exec(text);
   const lines = (block ? block[1] : text).split(/\r?\n/);
-  const out = { name: '', root: '.', strategy: 'agent-fleet', sync: { kind: 'git', labels: {} }, capacity: 'none', thresholds: {}, gates: {}, never: [], extra: {} };
+  const out = { name: '', root: '.', strategy: 'value-ladder', sync: { kind: 'git' }, never: [], extra: {} };
   for (const raw of lines) {
     const line = raw.trim();
     if (!line || line.startsWith('#')) continue;
@@ -75,11 +75,8 @@ export function parseProject(text) {
     const num = NUMERIC.test(val) ? Number(val) : val;
     if (key === 'sync') out.sync.kind = val || 'git';
     else if (key === 'sync.repo') out.sync.repo = val;
-    else if (key.startsWith('sync.labels.')) out.sync.labels[key.slice(12)] = val;
-    else if (key.startsWith('thresholds.')) out.thresholds[key.slice(11)] = num;
-    else if (key.startsWith('gates.')) out.gates[key.slice(6)] = val;
     else if (key === 'never') out.never = val.split(',').map((s) => s.trim()).filter(Boolean);
-    else if (['name', 'root', 'strategy', 'capacity'].includes(key)) out[key] = val;
+    else if (['name', 'root', 'strategy'].includes(key)) out[key] = val;
     else out.extra[key] = num;
   }
   return out;

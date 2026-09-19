@@ -21,7 +21,7 @@ Scratch files go in `ROOT/.done/work/` (create it; overwrite files there, never 
 
 ## 1. Read
 
-`ROOT/.done/project.md`, `ROOT/.done/state.md` and `ROOT/.done/plan.md` (note each `<!-- version: N -->`), the last 10 lines of `ROOT/.done/log.md`, `STRATEGY/ladder.md`, `STRATEGY/modes.md`, `STRATEGY/failure-checks.md`. `SINCE` = the date of the last `what-now` log line, else 14 days ago.
+`ROOT/.done/project.md`, `ROOT/.done/state.md` and `ROOT/.done/plan.md` (note each `<!-- version: N -->`), the last 10 lines of `ROOT/.done/log.md`, `STRATEGY/ladder.md`, `STRATEGY/modes.md`, `STRATEGY/failure-checks.md`. `STRATEGY` missing (e.g. `agent-fleet` from before 0.5) → use `strategies/value-ladder` and say so in Deltas. `SINCE` = the date of the last `what-now` log line, else 14 days ago.
 
 ## 2. Sync — facts only
 
@@ -34,7 +34,7 @@ Manual: `git -C "ROOT" log --since=SINCE --format='%h %ad %s' --date=short`. Do 
 b. **GitHub** — only when project.md has `sync: github`. First match wins:
 1. `gh --version` succeeds (*script*):
    ```
-   node ${CLAUDE_SKILL_DIR}/../../lib/sync-github.mjs --repo <sync.repo> --ready-label <sync.labels.ready> --in-progress-label <sync.labels.in_progress> --since SINCE > "ROOT/.done/work/github.json"
+   node ${CLAUDE_SKILL_DIR}/../../lib/sync-github.mjs --repo <sync.repo> --since SINCE > "ROOT/.done/work/github.json"
    ```
    Exit 2 (e.g. `gh` not authenticated) → try 2.
 2. A GitHub MCP connector is available. Find it by function, not by name: its tool names may be `mcp__<uuid>__*` with no `github` in them. Look (including deferred tools) for tools that list pull requests and list issues for a repo (e.g. `list_pull_requests`, `list_issues`). Call them for `<sync.repo>` and save each result's list of items, as returned, as a JSON array (unwrap an outer object such as `{"items": [...]}`; do not rename fields):
@@ -43,7 +43,7 @@ b. **GitHub** — only when project.md has `sync: github`. First match wins:
    - `ROOT/.done/work/issues.json` ← open issues
    Then (*script*):
    ```
-   node ${CLAUDE_SKILL_DIR}/../../lib/sync-github.mjs --from-dir "ROOT/.done/work" --repo <sync.repo> --ready-label <..> --in-progress-label <..> --since SINCE > "ROOT/.done/work/github.json"
+   node ${CLAUDE_SKILL_DIR}/../../lib/sync-github.mjs --from-dir "ROOT/.done/work" --repo <sync.repo> --since SINCE > "ROOT/.done/work/github.json"
    ```
    Save all three files on every run, even when you expect no change. Never reuse files from an earlier run. Exit 3 means a file is stale: save it again, then rerun once.
    Name the connector tools you used in the Deltas output (`sync: connector <tool names>`).
@@ -53,8 +53,8 @@ c. **self-report** — `sync: self-report`, or no facts at all: ask one question
 
 ## 3. Reconcile facts → plan.md status cells
 
-- Merged PR, or a git commit whose `#N` ref matches a card's `pr #N` / `filed #N` / `dispatched #N` → `done <date>`.
-- New open PR referencing a card's issue → `pr #N`. Ready label on a card's issue → `dispatched #N`.
+- Merged PR, or a git commit whose `#N` ref matches a card's `pr #N` / `filed #N` → `done <date>`.
+- New open PR referencing a card's issue → `pr #N`, whoever opened it.
 - A ruling from the user → `ruled <date>` plus a decisions.md line.
 - Run every "After sync" check in `STRATEGY/failure-checks.md`; each hit becomes a delta line, a watch-list item, or a blocker.
 - Scope change requested in `$ARGUMENTS` or during the run → add or cut the card now and append `- <date> — <card|scope> — <ruling> — by <owner> [owner-call]` to `ROOT/.done/decisions.md`. Do not refuse. Do not run goals.
@@ -67,10 +67,10 @@ If any cell changed, write the new plan to `ROOT/.done/work/plan.md`.
 ```
 node ${CLAUDE_SKILL_DIR}/../../lib/cards.mjs validate "PLAN" --log "ROOT/.done/log.md"
 node ${CLAUDE_SKILL_DIR}/../../lib/cards.mjs derive "PLAN" --json
-node ${CLAUDE_SKILL_DIR}/../../lib/counts.mjs "PLAN" --project "ROOT/.done/project.md" [--facts "ROOT/.done/work/github.json"] --json
+node ${CLAUDE_SKILL_DIR}/../../lib/counts.mjs "PLAN" [--facts "ROOT/.done/work/github.json"] --json
 ```
 Validation exit 2 → if every problem is in a row you edited in step 3, fix those rows and re-run. A problem in a row you did not edit → show the problems, say `Plan invalid: run /done:goals-done reconcile`, and stop without writing anything. Pass `--facts` only when a `sync-github.mjs` call in this run's step 2b exited 0 (a failed call leaves `github.json` empty, and an earlier run's file may be stale).
-Manual: READY NOW = open cards whose card blockers are all done/ruled and with no `ext:`/`owner:` blocker; IN FLIGHT = `dispatched`/`pr`; AWAITING GATE = `pr`; DECIDE order = ready DECIDE cards by number of cards transitively blocked on them, descending, then plan order.
+Manual: READY NOW = open cards whose card blockers are all done/ruled and with no `ext:`/`owner:` blocker; AWAITING GATE = `pr`; UNBLOCKS = number of cards transitively blocked on a card; DECIDE order = ready DECIDE cards by UNBLOCKS, descending, then plan order.
 
 ## 5. Route
 
@@ -78,7 +78,7 @@ Apply `STRATEGY/ladder.md` top down with the counts, the watch list and `$ARGUME
 
 ## 6. Prepare the routed card per `STRATEGY/modes.md`
 
-Read the files the card needs before writing the packet, ticket, pre-read or checklist. Before a DISPATCH ticket, run the "Before dispatch" checklist and show it ticked. Never flip a label, merge, or edit anything listed under `never:` in project.md; list those actions for the owner.
+Read the files the card needs before writing the packet, pre-read, checklist or first step. Never merge, or edit anything listed under `never:` in project.md; list those actions for the user.
 
 ## 7. Write (*script*, guarded)
 
@@ -98,5 +98,5 @@ Deltas: <one line each, or "none">
 Blockers: <or "none">
 Next: <card id> — <action>
 Why: <one sentence: rule k, or the deviation reason>
-First action: <the prepared artifact: packet / ticket + label command / pre-read / checklist / step>
+First action: <the prepared artifact: packet / pre-read / checklist / step>
 ```

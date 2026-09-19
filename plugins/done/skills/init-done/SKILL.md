@@ -32,19 +32,16 @@ Skip any question whose answer is already in `ROOT/.done/project.md`. Order:
 
 1. Project name, and the goal in one sentence. (→ `name`, `## Goal`)
 2. Where is progress visible? Local git only, GitHub issues and PRs, or nowhere (you tell me each run)? (→ `sync: git | github | self-report`; github → `sync.repo: owner/repo`)
-3. If GitHub: which label means "ready for a worker", which "in progress"? (→ `sync.labels.ready`, `sync.labels.in_progress`)
-4. Who does work besides you: agents, people, nobody? (→ `capacity: agents | people | none`)
-5. If agents or people: how many should be busy at once? (→ `thresholds.max_in_flight`)
-6. Which files or surfaces must this plugin never edit? (→ `never`, comma-separated)
+3. Which files or surfaces must this plugin never edit? (→ `never`, comma-separated)
 
-Edit only the lines inside the fenced block of project.md and the `## Goal` paragraph; keep the FORMAT CONTRACT comment. `strategy: agent-fleet` (the only one shipped). Do not ask about gates or `rebase_after`; defaults apply until the user edits project.md.
+Edit only the lines inside the fenced block of project.md and the `## Goal` paragraph; keep the FORMAT CONTRACT comment. `strategy: value-ladder` (the only one shipped).
 
 ## 3. Legacy plan conversion (only with `--from <path>`)
 
 Read the file. For every table row or list item that is a unit of work, draft one card in the grammar at the top of `ASSETS/plan-template.md`:
 - Struck (`~~`) or done rows → omit; list them in the reply as "already done, not carried over".
 - Free-text "Blocked on" → `ext:<text>`; tell the user so they can replace it with a card id.
-- Unknown mode → nearest of DECIDE / DISPATCH / REVIEW / QA / DO; say which you guessed.
+- Unknown mode → nearest of DECIDE / REVIEW / QA / DO (delegated work → DO); say which you guessed.
 - Rulings found inline → one line each in `ROOT/.done/decisions.md`.
 
 Write the draft to `ROOT/.done/work/plan.md`, then:

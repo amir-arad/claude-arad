@@ -17,7 +17,7 @@ test('parsePlan reads milestones, cards, cut list, version', () => {
   assert.equal(p.milestones[0].exit, 'reviews done.');
   const m22 = p.milestones[1].cards.find((c) => c.id === 'M2.2');
   assert.deepEqual(m22.blockedOn, [{ kind: 'card', ref: 'M2.1' }]);
-  assert.deepEqual(m22.status, { kind: 'dispatched', ref: '2131' });
+  assert.deepEqual(m22.status, { kind: 'filed', ref: '2131' });
   const m26 = p.milestones[1].cards.find((c) => c.id === 'M2.6');
   assert.equal(m26.mode, 'QA');
   assert.equal(m26.gate, 'Daniel');
@@ -35,18 +35,25 @@ test('parsePlan reports every grammar violation', () => {
   assert.match(text, /M1\.5.*unknown card M9\.9/);
 });
 
-test('derive computes ready, in-flight, gate, decide order', () => {
+test('parsePlan rejects the dispatched status (removed in 0.5)', () => {
+  const p = parsePlan('## M1 — A\n| Card | Action | Mode | Owner | Blocked on | Status |\n|---|---|---|---|---|---|\n| M1.1 | x | DO |  |  | dispatched #3 |\n');
+  assert.match(p.problems.join('\n'), /M1\.1 Status "dispatched #3"/);
+});
+
+test('derive computes ready, gate, decide order', () => {
   const d = derive(parsePlan(read('plan-valid.md')));
-  assert.deepEqual(d.inFlight.sort(), ['M1.1', 'M2.2']);
+  assert.equal(d.inFlight, undefined);
   assert.deepEqual(d.awaitingGate, ['M1.1']);
   assert.deepEqual(d.done, ['M1.2', 'M2.1']);  // ruled counts as settled, like done
   assert.ok(d.ready.includes('M2.4'));
-  assert.ok(!d.ready.includes('M2.3'));       // blocked on in-flight M2.2
+  assert.ok(!d.ready.includes('M2.3'));       // blocked on open M2.2
   assert.ok(!d.ready.includes('M2.5'));       // blocked on open M2.4
   assert.ok(!d.ready.includes('M2.6'));       // ext blocker never auto-clears
   assert.ok(!d.ready.includes('M2.7'));       // owner blocker never auto-clears
   assert.deepEqual(d.blocked['M2.3'], ['M2.2']);
   assert.deepEqual(d.decideOrder, ['M2.4']);  // M2.5 not ready; M2.1 ruled
+  assert.equal(d.unblocks['M2.4'], 1);          // M2.5 waits on it
+  assert.deepEqual(Object.keys(d.unblocks).sort(), [...d.ready].sort());
 });
 
 test('parsePlan accepts CRLF line endings', () => {
