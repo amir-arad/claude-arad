@@ -43,4 +43,8 @@ Unknown: what mapped the host path to the sandbox path. It was either the shell 
 
 - Skill-tool route versus slash form.
 - v2 in Claude Code CLI.
-- Host-to-sandbox mapping for `node <path>`.
+- Host-to-sandbox mapping for `node <path>` and for the Read tool (smoke v3 A6, A7).
+
+## Smoke v2 rerun
+
+A second v2 run in the same session (`practical-great-bell`) produced the same output. `find` returned none, and cwd was `/sessions/practical-great-bell`, the session home, not the selected folder.

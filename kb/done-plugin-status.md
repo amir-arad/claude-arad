@@ -42,16 +42,30 @@ A second session (claude-arad-c1) reviewed the design. Its accepted points are i
 | PR #7, smoke v2 | merged, together with KB commit `801ac68` |
 | Smoke v2 in Cowork | placeholders substituted to the Windows host path, `ls` through both succeeded. See [skill placeholders in Cowork](skill-placeholders-unset-in-cowork.md) |
 | PR #9, KB notes | open |
+| Smoke v3 | in PR #9, awaiting a Cowork run |
 | Tasks 2–13 | not started |
 
-## Pending user approval
+## Decisions after smoke v2 (2026-09-19)
 
-Proposed after smoke v2:
-1. Resolve paths via `${CLAUDE_SKILL_DIR}`. If the path is a drive-letter path that doesn't exist, rebuild it as `~/mnt/.remote-plugins/plugin_<id>/...`.
-2. In Cowork, `.done/` goes only in a user-selected folder. `init` refuses the session home and `outputs/`.
-3. Shell writes into a selected folder are untested. A failed write is treated as a refusal, and the model then writes with Write.
-4. `gh` is absent, so Cowork runs use self-report sync.
+User decisions:
+- **Project folder:** "in cowork there is always a folder. init should work on the root of the project folder." `.done/` goes at that root.
+- **Sync:** "read git". Local `git log`/`status` in the folder, plus a GitHub MCP connector when one is available. `gh` is optional (Claude Code only). Self-report is the last resort.
+- **Generic:** nothing specific to starwards (org, repo, labels) goes into `done`.
+- **Paid tests:** each Cowork run costs the user, so every smoke run must probe everything still open.
 
+Implementation details, settled by testing rather than approval:
+- Paths: `${CLAUDE_SKILL_DIR}/../../<dir>/...`. Smoke v2 showed `ls` through the host path works. `node <path>` and the Read tool are tested in smoke v3.
+- Writes: shell, node and the Write tool into the selected folder are tested in smoke v3. Fallback if shell fails: the Write tool.
+
+## Smoke v3 (PR #9, not yet run)
+
+`plugins/done/skills/init/SKILL.md` plus `plugins/done/lib/smoke.mjs`. Checks:
+- A: placeholder text, `ls`/`head`/Read tool/`node` through the placeholder path, invocation route.
+- B: finding the selected folder under `~/mnt`, owner, mount line. cwd is the session home, not the folder (smoke v2).
+- C: shell, node and Write-tool write and delete in the folder, plus leftovers.
+- D: git repo, log, status, remote, `fetch`, stranded `.git/*.lock`.
+- E: `gh`, HTTPS to api.github.com, GitHub connector tool names, one read-only connector call.
+- F: tool versions, env, identity, cowork tool names.
 ## Design evidence sources
 
 - `C:/Workspace/helios/starwards-design/.claude/skills/starwards-what-now/SKILL.md`: one commit, 2026-08-02.

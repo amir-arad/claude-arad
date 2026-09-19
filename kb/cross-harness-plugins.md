@@ -66,7 +66,7 @@ Evidence base: docs, plus one run each of two smoke tests of `done` in Cowork, o
 | `~/mnt/outputs/` | create ok, `rm` denied |
 | `~/mnt/uploads/` | read-only |
 | plugin tree | read-only |
-| user-selected folder (`mcp__cowork__request_cowork_directory`) | Write/Edit ok; shell writes untested |
+| user-selected folder (`mcp__cowork__request_cowork_directory`) | Write/Edit ok; shell and node writes untested (smoke v3 C1–C5) |
 
 Per-project state belongs in a user-selected folder.
 
@@ -88,4 +88,15 @@ A temporary skill prints one line per check:
 5. `pwd`
 6. write-then-delete in the state folder
 
-Run it in both harnesses. `plugins/done/skills/init/SKILL.md` at 0.2.x covers 1–5.
+Run it in both harnesses. Smoke v2 (0.2.x) covered 1–5. Smoke v3 (PR #9) covers all six plus node, the Read tool, git and GitHub access. See [done status](done-plugin-status.md).
+
+## GitHub access from Cowork
+
+Evidence: one `starwards-what-now` run in Cowork (2026-09-19), as reported by that session:
+- The sandbox had no network to GitHub, so `git pull` failed.
+- The GitHub MCP connector (claude.ai GitHub app) worked: it listed PRs and issues, read issues and PRs, and wrote an issue.
+- The connector reads are live API calls.
+
+Consequence for `done` sync: local git in the folder, plus the connector when present. `gh` is absent in Cowork.
+
+Untested: whether a skill can detect the connector other than by listing tool names or calling a tool. Smoke v3 check E3 lists tool names.
