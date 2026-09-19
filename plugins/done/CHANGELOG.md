@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/amir-arad/claude-arad/compare/done-v0.4.3...done-v0.5.0) (2026-09-19)
+
+
+### Features
+
+* **done:** scope to one person; value-ladder replaces agent-fleet ([#23](https://github.com/amir-arad/claude-arad/issues/23)) ([982ad59](https://github.com/amir-arad/claude-arad/commit/982ad593ce25d017255ae8d9878b05a27155a8d0))
+
 ## [0.4.3](https://github.com/amir-arad/claude-arad/compare/done-v0.4.2...done-v0.4.3) (2026-09-19)
 
 
