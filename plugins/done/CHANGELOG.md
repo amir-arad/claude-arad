@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.3](https://github.com/amir-arad/claude-arad/compare/done-v0.4.2...done-v0.4.3) (2026-09-19)
+
+
+### Bug Fixes
+
+* **done:** escaped pipes in cells, wrapped connector results, stop on invalid plan ([#20](https://github.com/amir-arad/claude-arad/issues/20)) ([5af52bf](https://github.com/amir-arad/claude-arad/commit/5af52bf06dc6fd4bfbcfe54e06f1b1f99134c16f))
+
 ## [0.4.2](https://github.com/amir-arad/claude-arad/compare/done-v0.4.1...done-v0.4.2) (2026-09-19)
 
 
