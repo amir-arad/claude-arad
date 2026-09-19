@@ -65,7 +65,7 @@ If any cell changed, write the new plan to `ROOT/.done/work/plan.md`.
 
 `PLAN` = `ROOT/.done/work/plan.md` if step 3 wrote it, else `ROOT/.done/plan.md`.
 ```
-node ${CLAUDE_SKILL_DIR}/../../lib/cards.mjs validate "PLAN"
+node ${CLAUDE_SKILL_DIR}/../../lib/cards.mjs validate "PLAN" --log "ROOT/.done/log.md"
 node ${CLAUDE_SKILL_DIR}/../../lib/cards.mjs derive "PLAN" --json
 node ${CLAUDE_SKILL_DIR}/../../lib/counts.mjs "PLAN" --project "ROOT/.done/project.md" [--facts "ROOT/.done/work/github.json"] --json
 ```

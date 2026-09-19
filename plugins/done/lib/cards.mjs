@@ -64,7 +64,18 @@ export function parsePlan(text) {
   for (const card of all) for (const b of card.blockedOn) {
     if (b.kind === 'card' && !ids.has(b.ref)) out.problems.push(`line ${card.line}: ${card.id} blocked on unknown card ${b.ref}`);
   }
+  // Card ids are never reused: log.md and the cut list must keep pointing at one card.
+  for (const line of out.cut) {
+    const id = line.split(/\s/)[0];
+    if (ids.has(id)) out.problems.push(`line ${ids.get(id).line}: ${id} reuses a cut card id`);
+  }
   return out;
+}
+
+export function retiredProblems(plan, logText) {
+  const archived = new Set([...logText.matchAll(/ archive card:(\S+)/g)].map((m) => m[1]));
+  return plan.milestones.flatMap((m) => m.cards).filter((c) => archived.has(c.id))
+    .map((c) => `line ${c.line}: ${c.id} reuses an archived card id (see log.md)`);
 }
 
 export function derive(plan) {
@@ -100,19 +111,25 @@ const HELP = `cards.mjs — parse, validate or derive from a done plan.md
 
 Usage:
   node cards.mjs parse    <plan.md> [--json]
-  node cards.mjs validate <plan.md> [--json]     exit 2 and list problems if the grammar is violated
+  node cards.mjs validate <plan.md> [--log log.md] [--json]   exit 2 and list problems if the grammar is violated;
+                                                   --log also rejects ids of cards archived in log.md
   node cards.mjs derive   <plan.md> [--json]     ready / in-flight / awaiting-gate / blocked / decide order
 Exit codes: 0 ok, 1 usage, 2 validation failed.
 `;
 
 if (isMain(import.meta.url)) {
-  const args = parseArgs(process.argv.slice(2), { flags: ['json', 'help'] });
+  const args = parseArgs(process.argv.slice(2), { flags: ['json', 'help'], options: ['log'] });
   if (args.help || args._.length === 0) { process.stdout.write(HELP); process.exit(0); }
   const [cmd, file] = args._;
   if (!['parse', 'validate', 'derive'].includes(cmd) || !file) fail('usage: cards.mjs <parse|validate|derive> <plan.md>', 1);
   const text = readText(file);
   if (text === null) fail(`cannot read ${file}`, 1);
   const plan = parsePlan(text);
+  if (args.log) {
+    const logText = readText(args.log);
+    if (logText === null) fail(`cannot read ${args.log}`, 1);
+    plan.problems.push(...retiredProblems(plan, logText));
+  }
   if (cmd === 'validate' || plan.problems.length) {
     if (plan.problems.length) {
       if (args.json) emit({ ok: false, problems: plan.problems }, args);

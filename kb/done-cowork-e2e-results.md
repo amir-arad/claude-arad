@@ -39,7 +39,7 @@ Unknown: whether the connector itself returns this trimmed field set, or the mod
 
 ## Still open
 
-- **Card id reuse.** goals gave the new "pick license" card the id `M1.1`, which was also the cut placeholder's id, so the log and the cut list now refer to two different M1.1 cards. Not fixed. Possible fix: goals never reuses an id that appears in the cut list or the log.
+- **Card id reuse** — fixed in the follow-up PR (fix/done-card-id-reuse): `cards.mjs validate` rejects a card id that starts a cut-list line, and with `--log` one archived in log.md; goals and what-now pass `--log`; the plan grammar says ids are never reused and cut card lines start with their id. Checked on the real e2e plan: `line 23: M1.1 reuses a cut card id`, exit 2. Side effect: a plan that already reuses an id fails validation until renumbered.
 - **The fixes have not run in Cowork.** They are covered by tests only (27 pass).
 - Planned but still unobserved:
   - the `gh` exit-2 fallback

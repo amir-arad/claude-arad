@@ -36,7 +36,7 @@ Strictly ordered. Each: id, title, one `Exit:` line. Rows inside a milestone are
 
 ## 4. Cards
 
-In the grammar at the top of `ASSETS/plan-template.md`. Every DISPATCH names an issue (`filed #N`) or states in its Action that one must be filed; every DECIDE names in its Action who consumes the ruling. Cuts go to `## Cut list` with a reason, never silently dropped.
+In the grammar at the top of `ASSETS/plan-template.md`. Every DISPATCH names an issue (`filed #N`) or states in its Action that one must be filed; every DECIDE names in its Action who consumes the ruling. Cuts go to `## Cut list` with a reason, never silently dropped; a cut card line starts with its id. New cards take the next unused number: never an id in the cut list or in a log.md `archive card:` line.
 Reconcile every `[owner-call]` line in decisions.md dated after the last `goals` log line: each becomes a card, a cut-list line, or is superseded (say which).
 Reversal → append `- <date> — <what> — reversed: <old> → <new> — by <owner>` to decisions.md.
 
@@ -44,7 +44,7 @@ Reversal → append `- <date> — <what> — reversed: <old> → <new> — by <o
 
 Write the new plan to `ROOT/.done/work/plan.md`, then:
 ```
-node ${CLAUDE_SKILL_DIR}/../../lib/cards.mjs validate "ROOT/.done/work/plan.md"
+node ${CLAUDE_SKILL_DIR}/../../lib/cards.mjs validate "ROOT/.done/work/plan.md" --log "ROOT/.done/log.md"
 node ${CLAUDE_SKILL_DIR}/../../lib/state-write.mjs "ROOT/.done/plan.md" --expect-version <version from step 0> --from "ROOT/.done/work/plan.md" --json
 node ${CLAUDE_SKILL_DIR}/../../lib/log-append.mjs "ROOT" --run goals --version <new plan version> --card - --rule - --text "<one line: what changed>"
 ```
