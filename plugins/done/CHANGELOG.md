@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/amir-arad/claude-arad/compare/done-v0.2.2...done-v0.3.0) (2026-09-19)
+
+
+### Features
+
+* **done:** scripts and templates ([#12](https://github.com/amir-arad/claude-arad/issues/12)) ([ff3601c](https://github.com/amir-arad/claude-arad/commit/ff3601c2bb8ce0caacbd86bc5bb287e7a393a1e9))
+
 ## [0.2.2](https://github.com/amir-arad/claude-arad/compare/done-v0.2.1...done-v0.2.2) (2026-09-19)
 
 
