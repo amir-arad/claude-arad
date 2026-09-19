@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 import { execFileSync } from 'node:child_process';
+import fs from 'node:fs';
 import path from 'node:path';
 import { parseArgs, fail, emit, isMain, readText } from './lib.mjs';
 
 const REF_RE = /(?:close[sd]?|fixe?[sd]?|resolve[sd]?)\s+#(\d+)/gi;
 const DAY = 86400000;
+const MAX_AGE = 15 * 60000;  // raw files must come from this run, not an earlier one
 
 // Accepts `gh --json` shape and GitHub REST shape (what an MCP connector returns).
 const login = (x) => x.author?.login ?? x.user?.login ?? '';
@@ -35,7 +37,7 @@ export function buildFacts({ repo, since, now = new Date(), mergedRaw, openRaw, 
   return {
     source: 'github', repo, since,
     merged: mergedRaw
-      .filter((p) => (p.mergedAt ?? p.merged_at))
+      .filter((p) => (p.mergedAt ?? p.merged_at) && (p.mergedAt ?? p.merged_at).slice(0, 10) >= since)
       .map((p) => ({ number: p.number, title: p.title, mergedAt: p.mergedAt ?? p.merged_at, author: login(p) })),
     openPrs: openPrs.map(({ refs, ...p }) => p),
     readyNoPr, inProgress, duplicateClaims, staleLabels, errors: [],
@@ -48,18 +50,20 @@ function gh(args) {
 }
 
 function fromDir(dir, name) {
-  const text = readText(path.join(dir, name));
-  if (text === null) fail(`missing ${path.join(dir, name)}`, 1);
+  const file = path.join(dir, name);
+  const text = readText(file);
+  if (text === null) fail(`missing ${file}`, 1);
+  if (Date.now() - fs.statSync(file).mtimeMs > MAX_AGE) fail(`stale ${file}: save it again from the connector in this run`, 3);
   try { return JSON.parse(text); } catch (e) { fail(`${name} is not JSON: ${e.message}`, 1); }
 }
 
-const HELP = `sync-github.mjs — GitHub facts for /done:what-now.
+const HELP = `sync-github.mjs — GitHub facts for /done:what-now-done.
 Usage:
   node sync-github.mjs --repo owner/repo [--ready-label L] [--in-progress-label L] [--since YYYY-MM-DD]
   node sync-github.mjs --from-dir <dir> [--repo owner/repo] [labels, --since as above]
 --from-dir reads merged.json, open.json, issues.json (gh or GitHub REST shape, e.g. saved from an MCP connector).
 Output is always JSON. behindBy is null: neither source gives it cheaply.
-Exit: 0 facts, 1 usage, 2 gh unavailable (use --from-dir or git facts only).
+Exit: 0 facts, 1 usage, 2 gh unavailable (use --from-dir or git facts only), 3 a --from-dir file is older than 15 minutes.
 `;
 
 if (isMain(import.meta.url)) {

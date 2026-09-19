@@ -46,7 +46,7 @@ A second session (claude-arad-c1) reviewed the design. Its accepted points are i
 | Spec §5/§7/§8 + plan revisions | PR #12 (first commit) |
 | Tasks 2–8, scripts and templates | PR #12 merged, released `done` 0.3.0 |
 | Tasks 9–12, strategy + skills init/what-now/goals | branch `feat/done-skills`, 24 tests pass; `lib/smoke.mjs` removed |
-| Task 13, Cowork end-to-end | protocol ready: [Cowork e2e protocol](done-cowork-e2e.md); not run |
+| Task 13, Cowork end-to-end | ran on 0.4.0: [results](done-cowork-e2e-results.md). 3 sync bugs + skill rename fixed in branch `fix/done-e2e-sync` |
 
 ## Decisions after smoke v2 (2026-09-19)
 
@@ -80,10 +80,11 @@ Also: bash cannot resolve the folder's Windows path, so use `~/mnt/<name>`. Outp
 
 ## Open risks
 
-- Typing `/done:init` goes through the Skill tool: a hook reported `Skill "done:init" was invoked` (smoke v3 A8). Invoking from the model without the slash command is untested.
+- Typing `/done:init-done` goes through the Skill tool: a hook reported `Skill "done:init-done" was invoked` (smoke v3 A8). Invoking from the model without the slash command is untested.
 - Ladder rule 1's precedence rests on one PR-rot episode (playbook v94).
 - The strict card grammar rejects the current starwards playbook. Conversion cost is unmeasured.
 - The self-report and `capacity: none` paths have no real-project evidence.
+- **Pinned: skill names (init, what-now, goals) collide with generic names.** Evidence (e2e run, 2026-09-19): Cowork shows a typed `/done:init-done` as `/init` with the namespace dropped, but it still ran done's init. So routing uses the full name; the drop is display only. Claude Code has a built-in `/init`, and other plugins may ship `init`. Rename (e.g. `init-done`) only if a bare `/init` in Cowork runs done's init or is ambiguous. Cost of a rename: Claude Code shows `/done:init-done-done`. Result (same run, step 7): the Cowork picker lists two identical `init` entries, done and garden. Only the hover tooltip (description + "Done plugin" / "Garden plugin") tells them apart. Ambiguity confirmed at selection time → rename justified.
 
 ## Build decisions in PR #12 (2026-09-19)
 

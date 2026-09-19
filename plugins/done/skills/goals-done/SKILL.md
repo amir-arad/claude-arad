@@ -1,5 +1,5 @@
 ---
-name: goals
+name: goals-done
 description: Replan. Restates the intended change, sweeps evidence, lists gaps, rewrites milestones and cards in .done/plan.md, reconciles owner-call decisions, records reversals. Confirms with you before writing.
 argument-hint: "<the change: new goal, cut, re-prioritise, or 'reconcile'>"
 disable-model-invocation: true
@@ -12,9 +12,9 @@ disable-model-invocation: true
 ## Project root → `ROOT`
 
 Same rule as what-now:
-- Cowork (`~/mnt/` exists): `ls -a ~/mnt`; candidates are entries other than `outputs`, `uploads` and dot-dirs that contain `.done/`. One → `ROOT`. Several → ask which. None → `Run /done:init`, stop.
+- Cowork (`~/mnt/` exists): `ls -a ~/mnt`; candidates are entries other than `outputs`, `uploads` and dot-dirs that contain `.done/`. One → `ROOT`. Several → ask which. None → `Run /done:init-done`, stop.
 - Otherwise: `git rev-parse --show-toplevel`, else the current directory.
-- `ROOT/.done/` missing → `Run /done:init`, stop.
+- `ROOT/.done/` missing → `Run /done:init-done`, stop.
 
 Scratch files go in `ROOT/.done/work/` (overwrite, never delete).
 
@@ -54,4 +54,4 @@ Manual: as in what-now step 7; log line with `manual:`. Nothing is committed.
 
 ## 6. Output
 
-Milestones with exit criteria, card count per milestone, cut-list additions, reversals recorded, then `Next: run /done:what-now`.
+Milestones with exit criteria, card count per milestone, cut-list additions, reversals recorded, then `Next: run /done:what-now-done`.
