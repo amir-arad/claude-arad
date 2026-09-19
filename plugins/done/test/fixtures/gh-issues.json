@@ -1,0 +1,5 @@
+[
+  {"number": 2131, "title": "Registry", "labels": [{"name": "agent-in-progress"}], "updatedAt": "2026-09-13T00:00:00Z"},
+  {"number": 2140, "title": "Assign command", "labels": [{"name": "agent-ready"}], "updatedAt": "2026-09-12T00:00:00Z"},
+  {"number": 2150, "title": "Old claim", "labels": [{"name": "agent-in-progress"}], "updatedAt": "2026-09-05T00:00:00Z"}
+]
