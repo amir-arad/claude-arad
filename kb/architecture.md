@@ -9,7 +9,7 @@ A Claude Code plugin marketplace. The marketplace manifest is `.claude-plugin/ma
 | Kind | Where | Runtime |
 |---|---|---|
 | CI sync script | `scripts/generate-release-config.js` (CommonJS) | Node 22 in GitHub Actions |
-| Plugin libraries | `plugins/garden/lib/*.mjs`, `plugins/other-models/lib/ask.mjs` | Node, invoked by skills via `${CLAUDE_PLUGIN_ROOT}` |
+| Plugin libraries | `plugins/garden/lib/*.mjs`, `plugins/other-models/lib/ask.mjs`, `plugins/done/lib/*.mjs` | Node, invoked by skills via `${CLAUDE_PLUGIN_ROOT}` (garden) or `${CLAUDE_SKILL_DIR}/../../lib` (done) |
 | Skill scripts | `plugins/base-plugin/skills/skill-creator/scripts/*.py` | Python (Anthropic's skill-creator, Apache-2.0) |
 | Hook | `plugins/base-plugin/hooks/example-guard.sh` | Bash, PreToolUse on `Bash`; no-op (`exit 0`) |
 | Skills | `plugins/*/skills/<skill>/SKILL.md` | Markdown instructions read by Claude |
@@ -44,7 +44,7 @@ From `marketplace.json` and `plugins/`:
 | `likec4` | 0.2.0 | `architecture-model` skill; `.mcp.json` runs `npx -y @likec4/mcp`; declares dependency on `likec4-dsl` |
 | `context` | 0.1.0 | `carryout` skill |
 | `other-models` | 0.2.0 | `ask-model` skill, `lib/ask.mjs` (drives `agy` / `codex` CLIs headlessly) |
-| `done` | 0.2.0 | `init` skill (smoke check only; `disable-model-invocation: true`) |
+| `done` | 0.2.2 (0.3.0 after PR #12) | `init` skill (smoke v3 until Task 10), `lib/*.mjs` fact and write scripts, `assets/` templates, `test/` (node:test) |
 | `likec4-dsl` | — (external) | tracked from `likec4/likec4` `main`, path `skills`, `strict: false` |
 
 ## Constraints that shape the layout
@@ -55,6 +55,6 @@ From `marketplace.json` and `plugins/`:
 
 ## Not covered
 
-No tests, linter, lockfile or task runner exist (`setup-check`), so there is no build graph to describe. The `docs/superpowers/` folder holds a design spec and plan for the `done` plugin dated 2026-09-15; it is not part of the marketplace and is not summarised here.
+No linter, lockfile or task runner exists; the only tests are `done`'s (`node --test plugins/done/test/*.test.mjs`) (`setup-check`), so there is no build graph to describe. The `docs/superpowers/` folder holds a design spec and plan for the `done` plugin dated 2026-09-15; it is not part of the marketplace and is not summarised here.
 
 Related: [setup](setup.md), [deployment](deployment.md), [glossary](glossary.md).

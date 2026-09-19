@@ -43,7 +43,10 @@ A second session (claude-arad-c1) reviewed the design. Its accepted points are i
 | Smoke v2 in Cowork | placeholders substituted to the Windows host path, `ls` through both succeeded. See [skill placeholders in Cowork](skill-placeholders-unset-in-cowork.md) |
 | PR #9, KB notes + smoke v3 | merged |
 | Smoke v3 | PR #9 merged, released 0.2.2, ran in Cowork |
-| Tasks 2–13 | not started |
+| Spec §5/§7/§8 + plan revisions | PR #12 (first commit) |
+| Tasks 2–8, scripts and templates | PR #12 open, 23 tests pass |
+| Tasks 9–12 | not started; wait for PR #12 merge |
+| Task 13, Cowork end-to-end | not started |
 
 ## Decisions after smoke v2 (2026-09-19)
 
@@ -81,3 +84,23 @@ Also: bash cannot resolve the folder's Windows path, so use `~/mnt/<name>`. Outp
 - Ladder rule 1's precedence rests on one PR-rot episode (playbook v94).
 - The strict card grammar rejects the current starwards playbook. Conversion cost is unmeasured.
 - The self-report and `capacity: none` paths have no real-project evidence.
+
+## Build decisions in PR #12 (2026-09-19)
+
+Recorded in detail in the plan's "Revisions after Gate 0" section. Summary:
+- `lib/sync-git.mjs`: facts from `git log` only (commits since a date, `#N` refs). It skips `git status` because of the CRLF effect in Cowork.
+- `lib/sync-github.mjs`: `gh` (Claude Code), or `--from-dir` with `merged.json`/`open.json`/`issues.json` that the model saves from a GitHub MCP connector. It accepts both `gh` and REST shapes.
+  - The REST shape is inferred from the GitHub API docs, not recorded from a real connector call. Task 13 must check it.
+- `writeAtomic` (temp file + rename) for every rewrite; no script deletes.
+- `init-scaffold` refuses the home dir and `~/mnt/outputs`.
+- `project.md` default `sync: git`.
+- Plan defects found and fixed:
+  - A test contradicted the rule that `ruled` cards are archived like `done`.
+  - Watch items were dropped in the same run they were ticked.
+  - The log was appended before the write.
+  - The parsers did not handle CRLF.
+
+## Host facts found while building
+
+- Checkouts on this Windows host have CRLF working trees (`core.autocrlf=true`). Any parser of `.done/` files must split on `\r?\n`.
+- `node --test <dir>` fails on node v22.13.1 on Windows. Use a `*.test.mjs` glob.
