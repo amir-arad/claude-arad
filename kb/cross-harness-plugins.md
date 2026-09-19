@@ -39,12 +39,12 @@ Evidence base: docs, plus one run each of two smoke tests of `done` in Cowork, o
 | v1 | shell `$CLAUDE_SKILL_DIR` | empty. No substitution result |
 | v2 (PR #7) | text `${CLAUDE_SKILL_DIR}`, `${CLAUDE_PLUGIN_ROOT}` | both substituted, to the Windows host path |
 
-- In v2, `ls` through the host path succeeded against the sandbox path. The mapper is unknown: the shell tool or the model.
+- In v2 and v3, the shell, `node` and the Read tool all resolved the host path to the sandbox path. In v3, the run's model said the shell tool did the translation. See [smoke v3 results](cowork-smoke-v3-results.md).
 - Docs name `${CLAUDE_SKILL_DIR}` for skills generally ([Creating custom skills](https://claude.com/docs/skills/how-to)) and `${CLAUDE_PLUGIN_ROOT}` for Claude Code. Cowork substituted both.
 
-`done` design (unverified):
-1. All paths use `${CLAUDE_SKILL_DIR}/../../<dir>/...`.
-2. If the path doesn't exist, rebuild it as `~/mnt/.remote-plugins/plugin_<id>/...`. With no id, grep `~/mnt/.remote-plugins/*/.claude-plugin/plugin.json` for `"name"`.
+`done` design:
+1. All paths use `${CLAUDE_SKILL_DIR}/../../<dir>/...` (works, smoke v3).
+2. No rebuild fallback: it was not needed in smoke v3.
 
 `garden` uses `${CLAUDE_PLUGIN_ROOT}` and is untested in Cowork.
 
@@ -66,13 +66,15 @@ Evidence base: docs, plus one run each of two smoke tests of `done` in Cowork, o
 | `~/mnt/outputs/` | create ok, `rm` denied |
 | `~/mnt/uploads/` | read-only |
 | plugin tree | read-only |
-| user-selected folder (`mcp__cowork__request_cowork_directory`) | Write/Edit ok; shell and node writes untested (smoke v3 C1–C5) |
+| user-selected folder (`mcp__cowork__request_cowork_directory`) | create, overwrite and rename ok for shell, node and Write. Delete denied until `mcp__cowork__allow_cowork_file_delete`, per session. Use `~/mnt/<name>`; the Windows path fails in bash |
 
 Per-project state belongs in a user-selected folder.
 
 ## Git
 
 helios `CLAUDE.md` (2026-09-04): in a Cowork-mounted repo, git strands `.git/*.lock` unless `mcp__cowork__allow_cowork_file_delete` is granted first.
+
+Smoke v3: `rev-parse`, `log`, `status` and `remote` in the selected folder left no `.git/*.lock`. Inference: git removes a lock file by deleting it, and deletes are blocked before the grant, which would explain stranded locks. Only read-only git was tested; commit and checkout are untested.
 
 ## Frontmatter
 
@@ -99,4 +101,4 @@ Evidence: one `starwards-what-now` run in Cowork (2026-09-19), as reported by th
 
 Consequence for `done` sync: local git in the folder, plus the connector when present. `gh` is absent in Cowork.
 
-Untested: whether a skill can detect the connector other than by listing tool names or calling a tool. Smoke v3 check E3 lists tool names.
+Smoke v3: `curl api.github.com` got a 403 from the proxy, and `git fetch` over SSH failed. The connector tools are named `mcp__<uuid>__*`, with no `github` in the name. `list_pull_requests` worked.
