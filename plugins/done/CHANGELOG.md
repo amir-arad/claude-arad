@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.2](https://github.com/amir-arad/claude-arad/compare/done-v0.4.1...done-v0.4.2) (2026-09-19)
+
+
+### Bug Fixes
+
+* **done:** reject reused card ids ([#18](https://github.com/amir-arad/claude-arad/issues/18)) ([ea1438c](https://github.com/amir-arad/claude-arad/commit/ea1438cb0853e315011a8447f19de8cc201b4000))
+
 ## [0.4.1](https://github.com/amir-arad/claude-arad/compare/done-v0.4.0...done-v0.4.1) (2026-09-19)
 
 
