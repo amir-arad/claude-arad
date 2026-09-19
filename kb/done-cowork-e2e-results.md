@@ -40,6 +40,7 @@ Unknown: whether the connector itself returns this trimmed field set, or the mod
 ## Still open
 
 - **Card id reuse** — fixed in the follow-up PR (fix/done-card-id-reuse): `cards.mjs validate` rejects a card id that starts a cut-list line, and with `--log` one archived in log.md; goals and what-now pass `--log`; the plan grammar says ids are never reused and cut card lines start with their id. Checked on the real e2e plan: `line 23: M1.1 reuses a cut card id`, exit 2. Side effect: a plan that already reuses an id fails validation until renumbered.
+  - PR #18 review (approved, 29/29 tests on `611c361`). It suggested a `CARD_ID.test` guard on the cut-line token. Rejected: `ids` holds only card-row ids, and those always carry `.N`, so a milestone token like `M1` cannot match. The "next unused number" rule is prose only and not enforced; the invariant that matters is non-reuse, and validation enforces that. There is no migration helper for plans that already reuse an id (single user).
 - **The fixes have not run in Cowork.** They are covered by tests only (27 pass).
 - Planned but still unobserved:
   - the `gh` exit-2 fallback
