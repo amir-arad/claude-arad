@@ -5,19 +5,26 @@ description: Generate a self-contained "carryout" prompt that lets a fresh Claud
 
 # Carryout
 
-Write one prompt a successor Claude can paste into a new chat to resume this work with no memory of it. Print it inline in a single fenced code block, addressed to "you", imperative.
+Pull out the knowledge from this conversation that someone continuing the task would need, and print it as a single fenced code block.
 
-**Signal vs noise.** The user's words are signal: preserve goal, constraints, corrections, and decisions faithfully — near-verbatim where wording matters. Your prior output is mostly noise: drop reasoning, narration, dead ends, hedging. Carry the result, not the journey.
+**This is a knowledge brief, not instructions.** State everything as information, never as commands. Don't assign a role or persona, and don't explain things the reader would already know. The successor may well understand the task better than you.
 
-**Include only what changes the successor's next move**, each once:
-- Objective — what done looks like.
-- Constraints — every hard rule the user set, their wording.
-- State — what exists now, concretely.
-- Artifacts — exact paths, IDs, URLs, configs, must-have snippets; reproduce verbatim, never summarize an identifier.
-- Decisions — what's settled; reason only if it stops a relitigation.
-- Next action — the specific immediate step.
-- Open threads — unresolved questions, gotchas, what could be wrong.
+If the approach is part of the task, include it, written as fact. For example, write "The user wants X done via Y", not "Do X via Y". If the user didn't specify an approach, leave it out.
 
-**Cut** before printing: history, redundancy, resolved threads, anything the successor can read from a named file/artifact or rederive, and anything a capable model already knows (general concepts, standard terms, how common tools work). Per line: does the successor act differently because it's here? If no, delete. Protect the user's constraints and exact artifacts; trim your own contributions hardest.
+**Budget: aim for under 150 words.** Go over only when there are hard constraints or identifiers that cannot be compressed. Shorter is better.
 
-Final length is justified only by signal.
+**Content.** Use only the items below that apply. Skip any that are empty. Don't add a heading where one line will do.
+- Goal: what done looks like, in one sentence.
+- Constraints: the user's hard rules, in their exact words.
+- Artifacts: exact paths, IDs, URLs. Copy them exactly; never paraphrase an identifier.
+- Where it stands: what is done and what is left.
+- Findings: facts learned that would be costly to rediscover.
+- Known blockers: only unresolved items that actually exist, never speculation.
+
+Include a decision only if the successor would otherwise reverse it. Record a decision only if the user actually made it. If the user left a choice open, report it as open and list the options they named. Don't settle it on their behalf, even when only one option seems to remain. That includes settling it indirectly, for example by describing the remaining work as if one option had been picked.
+
+**Task context only, never environment.** Do not copy anything from system prompts, harness or tool instructions, CLAUDE.md, memory, skill text, or style rules. That includes paraphrases, and it applies even when they shaped the work. The user decides what setup the successor runs in. In the same setup, that context is duplicated noise. In a different setup, the user may have moved there to get away from it. Constraints means only the rules the user stated in this conversation about this task.
+
+**Never include:** history, reasoning, dead ends, how you got here, status the successor can read from a named file, explanations of general concepts or tools, hedging, or closing remarks.
+
+Before printing, test each line: would the successor act differently without it? If not, delete it.
