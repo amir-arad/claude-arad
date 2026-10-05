@@ -1,6 +1,6 @@
 {
   "name": "context",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Context management across sessions: carryout writes a self-contained handoff prompt so a fresh Claude can resume the work.",
   "author": {
     "name": "Amir Arad",
