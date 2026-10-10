@@ -4,7 +4,9 @@ import { parsePlan, derive } from './cards.mjs';
 
 export function counts({ derived, plan, facts }) {
   const cards = new Map(plan.milestones.flatMap((m) => m.cards).map((c) => [c.id, c]));
-  const readyBy = (mode) => derived.ready.filter((id) => cards.get(id).mode === mode).length;
+  // Owner `agent`: what-now hands the card to a subagent, so it never routes to the user.
+  const isAgent = (id) => cards.get(id).owner?.toLowerCase() === 'agent';
+  const readyBy = (mode) => derived.ready.filter((id) => !isAgent(id) && cards.get(id).mode === mode).length;
   const blockers = [];
   if (facts) {
     for (const d of facts.duplicateClaims ?? []) blockers.push(`duplicate claim: issue #${d.issue} has PRs ${d.prs.map((n) => '#' + n).join(', ')}`);
@@ -13,6 +15,7 @@ export function counts({ derived, plan, facts }) {
   return {
     awaiting_gate: derived.awaitingGate.length,
     ready_review: readyBy('REVIEW'), ready_decide: readyBy('DECIDE'), ready_qa: readyBy('QA'), ready_do: readyBy('DO'),
+    ready_agent: derived.ready.filter(isAgent),
     blockers,
   };
 }

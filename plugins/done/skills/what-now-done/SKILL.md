@@ -1,6 +1,6 @@
 ---
 name: what-now-done
-description: Route the next unit of work. Syncs facts from git (and GitHub when configured), updates .done/ state, applies the strategy ladder, and returns exactly one card with its first action prepared. Records scope moves made mid-run as owner-call decisions.
+description: Route the next unit of work. Syncs facts from git (and GitHub when configured), updates .done/ state, applies the strategy ladder, launches subagents for every chore that does not need the user, and returns exactly one card with its first action prepared. Records scope moves made mid-run as owner-call decisions.
 argument-hint: "[what changed, or a constraint for this run]"
 disable-model-invocation: true
 ---
@@ -56,6 +56,7 @@ c. **self-report** — `sync: self-report`, or no facts at all: ask one question
 - Merged PR, or a git commit whose `#N` ref matches a card's `pr #N` / `filed #N` → `done <date>`.
 - New open PR referencing a card's issue → `pr #N`, whoever opened it.
 - A ruling from the user → `ruled <date>` plus a decisions.md line.
+- Watch-list `agent: <card> started <date>` items: the card has a PR (already handled above) or its artifact exists → tick the item; the artifact completes a DO card → `done <date>`. Neither, and older than 2 days → a delta line `agent stalled: <card>`; untick it so step 6b relaunches it.
 - Run every "After sync" check in `STRATEGY/failure-checks.md`; each hit becomes a delta line, a watch-list item, or a blocker.
 - Scope change requested in `$ARGUMENTS` or during the run → add or cut the card now and append `- <date> — <card|scope> — <ruling> — by <owner> [owner-call]` to `ROOT/.done/decisions.md`. Do not refuse. Do not run goals.
 
@@ -70,7 +71,7 @@ node ${CLAUDE_SKILL_DIR}/../../lib/cards.mjs derive "PLAN" --json
 node ${CLAUDE_SKILL_DIR}/../../lib/counts.mjs "PLAN" [--facts "ROOT/.done/work/github.json"] --json
 ```
 Validation exit 2 → if every problem is in a row you edited in step 3, fix those rows and re-run. A problem in a row you did not edit → show the problems, say `Plan invalid: run /done:goals-done reconcile`, and stop without writing anything. Pass `--facts` only when a `sync-github.mjs` call in this run's step 2b exited 0 (a failed call leaves `github.json` empty, and an earlier run's file may be stale).
-Manual: READY NOW = open cards whose card blockers are all done/ruled and with no `ext:`/`owner:` blocker; AWAITING GATE = `pr`; UNBLOCKS = number of cards transitively blocked on a card; DECIDE order = ready DECIDE cards by UNBLOCKS, descending, then plan order.
+Manual: READY NOW = open cards whose card blockers are all done/ruled and with no `ext:`/`owner:` blocker; ready_agent = READY NOW cards with Owner `agent` (not counted in ready_do); AWAITING GATE = `pr`; UNBLOCKS = number of cards transitively blocked on a card; DECIDE order = ready DECIDE cards by UNBLOCKS, descending, then plan order.
 
 ## 5. Route
 
@@ -79,6 +80,16 @@ Apply `STRATEGY/ladder.md` top down with the counts, the watch list and `$ARGUME
 ## 6. Prepare the routed card per `STRATEGY/modes.md`
 
 Read the files the card needs before writing the packet, pre-read, checklist or first step. Never merge, or edit anything listed under `never:` in project.md; list those actions for the user.
+
+## 6b. Launch chores — automatic, no question
+
+The user rules, merges and runs QA; nothing else waits on them. Chores are:
+- every `counts.ready_agent` card;
+- the chore part (modes.md) of the card routed in step 5. Prepare the rest of its artifact now, and mark the missing inputs `running: <agent>`.
+
+Skip a chore whose card has an unticked `agent:` watch-list item. Launch up to `agents.max` (project.md, default 2) minus the unticked `agent:` items, unblocking order first. Each one is a background Agent call (`run_in_background`) with a self-contained prompt: card id and action, the finish condition, the files to read, where to write the artifact (`ROOT/.done/work/agent-<card>.md` unless the card names one), the `never:` list, "never merge, never apply or remove labels". Code changes: when project.md has `agents.worktree`, follow that instruction; otherwise pass `isolation: "worktree"`. The agent ends with a PR whose body references the card's issue, or with the artifact.
+Add `agent: <card> started <date>` to the watch list for each launch.
+No Agent tool (e.g. Cowork, headless) → launch nothing; output `Launched: unavailable — <chores>`.
 
 ## 7. Write (*script*, guarded)
 
@@ -99,4 +110,5 @@ Blockers: <or "none">
 Next: <card id> — <action>
 Why: <one sentence: rule k, or the deviation reason>
 First action: <the prepared artifact: packet / pre-read / checklist / step>
+Launched: <card — one line each, or "none">
 ```
