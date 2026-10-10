@@ -8,4 +8,4 @@
 | DO | Concrete first step and the finish condition | Owner `agent`: the whole card, ending in a PR or the named artifact | Do it (Owner empty) | Card `done <date>` | The first step, or the agent's PR |
 
 Per-card override: `(gate: <name>)` in the Mode cell names someone else whose approval the card needs.
-Subagents never merge, never apply or remove labels, and never edit anything under `never:`.
+Chores launch by `agents.dispatch` (default: subagent). Subagents never merge, never apply or remove labels, and never edit anything under `never:`.

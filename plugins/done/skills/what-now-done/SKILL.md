@@ -56,7 +56,7 @@ c. **self-report** — `sync: self-report`, or no facts at all: ask one question
 - Merged PR, or a git commit whose `#N` ref matches a card's `pr #N` / `filed #N` → `done <date>`.
 - New open PR referencing a card's issue → `pr #N`, whoever opened it.
 - A ruling from the user → `ruled <date>` plus a decisions.md line.
-- Watch-list `agent: <card> started <date>` items: the card has a PR (already handled above) or its artifact exists → tick the item; the artifact completes a DO card → `done <date>`. Neither, and older than 2 days → a delta line `agent stalled: <card>`; untick it so step 6b relaunches it.
+- Watch-list `agent: <card> started <date>` items: the card has a PR (already handled above) or its artifact exists → tick the item; the artifact completes a DO card → `done <date>`. Neither, and older than 2 days → a delta line `agent stalled: <card>`; untick it so step 6b relaunches it (a `filed #N` card is not relaunched: the stall is reported only, so the issue is not filed twice).
 - Run every "After sync" check in `STRATEGY/failure-checks.md`; each hit becomes a delta line, a watch-list item, or a blocker.
 - Scope change requested in `$ARGUMENTS` or during the run → add or cut the card now and append `- <date> — <card|scope> — <ruling> — by <owner> [owner-call]` to `ROOT/.done/decisions.md`. Do not refuse. Do not run goals.
 
@@ -87,9 +87,12 @@ The user rules, merges and runs QA; nothing else waits on them. Chores are:
 - every `counts.ready_agent` card;
 - the chore part (modes.md) of the card routed in step 5. Prepare the rest of its artifact now, and mark the missing inputs `running: <agent>`.
 
-Skip a chore whose card has an unticked `agent:` watch-list item. Launch up to `agents.max` (project.md, default 2) minus the unticked `agent:` items, unblocking order first. Each one is a background Agent call (`run_in_background`) with a self-contained prompt: card id and action, the finish condition, the files to read, where to write the artifact (`ROOT/.done/work/agent-<card>.md` unless the card names one), the `never:` list, "never merge, never apply or remove labels". Code changes: when project.md has `agents.worktree`, follow that instruction; otherwise pass `isolation: "worktree"`. The agent ends with a PR whose body references the card's issue, or with the artifact.
+Skip a chore whose card has an unticked `agent:` watch-list item. Launch up to `agents.max` (project.md, default 2) minus the unticked `agent:` items, unblocking order first. How each one launches depends on `agents.dispatch` (project.md):
+- empty or `subagent` → a background Agent call (`run_in_background`) with a self-contained prompt: card id and action, the finish condition, the files to read, where to write the artifact (`ROOT/.done/work/agent-<card>.md` unless the card names one), the `never:` list, "never merge, never apply or remove labels". Code changes: when project.md has `agents.worktree`, follow that instruction; otherwise pass `isolation: "worktree"`. The agent ends with a PR whose body references the card's issue, or with the artifact.
+- anything else → an instruction for an outside dispatcher (e.g. `file a gh issue with the card's spec and label it agent-go`). Follow it with the same self-contained spec as the prompt above. When it creates an issue, set the card's status to `filed #N`. The outside agent's PR comes back through sync. Apply only labels the instruction names, and never one that project or workspace policy reserves for the user.
+
 Add `agent: <card> started <date>` to the watch list for each launch.
-No Agent tool (e.g. Cowork, headless) → launch nothing; output `Launched: unavailable — <chores>`.
+The mechanism is unavailable (no Agent tool for `subagent`, or the dispatch command fails) → launch nothing; output `Launched: unavailable — <chores>`.
 
 ## 7. Write (*script*, guarded)
 
