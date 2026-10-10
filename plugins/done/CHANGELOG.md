@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0](https://github.com/amir-arad/claude-arad/compare/done-v0.5.0...done-v0.6.0) (2026-10-10)
+
+
+### Features
+
+* **done:** what-now launches agents for chores ([#26](https://github.com/amir-arad/claude-arad/issues/26)) ([a09d6e0](https://github.com/amir-arad/claude-arad/commit/a09d6e0ba8134adda5b96eaa0bd988ac045dc833))
+
 ## [0.5.0](https://github.com/amir-arad/claude-arad/compare/done-v0.4.3...done-v0.5.0) (2026-09-19)
 
 
