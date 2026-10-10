@@ -1,7 +1,7 @@
 # value-ladder — routing ladder
 
 First rule that fires wins. Inputs: `counts` JSON, `derive` JSON, watch list, user input.
-Scope: one person doing the work. How a card gets done (by hand, by this session, or handed to someone or something else) is outside the ladder; only its facts (issue filed, PR open, merged) come back through sync.
+Scope: the ladder routes the user's own work: rulings, merges, hands-on QA, and DO cards the user owns. Chores (DO cards with Owner `agent`, and the chore part of the routed card per modes.md) go to subagents in what-now step 6b and never route here. Results come back only as facts through sync (issue filed, PR open, merged) or as the artifact the agent wrote.
 
 0. **Blocker present** — `counts.blockers` non-empty, a watch-list item says blocked, or the user reports an environmental failure (CI red on the base branch, auth failure, a tool down). Route: clear the blocker. Log it as `card:-`.
 1. **Finished work waiting on you** — `awaiting_gate > 0` (a card at `pr #N`) or `ready_review > 0`. Route: the oldest such card. Prepare per REVIEW in modes.md. Unmerged work is the cheapest value to ship.

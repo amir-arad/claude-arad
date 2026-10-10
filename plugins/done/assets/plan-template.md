@@ -5,7 +5,7 @@ Cards: one table row per card under a milestone, columns exactly:
 | Card | Action | Mode | Owner | Blocked on | Status |
 Card: `<milestone>.<n>` unique (M1.2), never reused: not from the cut list, not from cards archived in log.md. Action: free text, one line; write a literal pipe as `\|`.
 Mode: DECIDE | REVIEW | QA | DO, optional suffix `(gate: <who>)`.
-Owner: empty = you; else a name.
+Owner: empty = you; `agent` = a subagent launched by what-now does it (DO only); else a name.
 Blocked on: comma list of card ids, `ext:<text>`, `owner:<name>`. Nothing else.
 Status: open | filed #N | pr #N | ruled YYYY-MM-DD | done YYYY-MM-DD
 Done rows are moved to log.md by state-write. No strikethrough anywhere.

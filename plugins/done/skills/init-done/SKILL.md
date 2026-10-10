@@ -41,7 +41,7 @@ Edit only the lines inside the fenced block of project.md and the `## Goal` para
 Read the file. For every table row or list item that is a unit of work, draft one card in the grammar at the top of `ASSETS/plan-template.md`:
 - Struck (`~~`) or done rows → omit; list them in the reply as "already done, not carried over".
 - Free-text "Blocked on" → `ext:<text>`; tell the user so they can replace it with a card id.
-- Unknown mode → nearest of DECIDE / REVIEW / QA / DO (delegated work → DO); say which you guessed.
+- Unknown mode → nearest of DECIDE / REVIEW / QA / DO (delegated work → DO, Owner `agent`); say which you guessed.
 - Rulings found inline → one line each in `ROOT/.done/decisions.md`.
 
 Write the draft to `ROOT/.done/work/plan.md`, then:

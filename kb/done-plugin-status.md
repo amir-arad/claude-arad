@@ -185,3 +185,12 @@ User decision: the plugin decides what is the most valuable next thing for **one
   - The `\|` survived state-write.
   - The log line was `what-now v2 rule:2 card:M1.2`.
 - Not checked: the goals conversion of a pre-0.5 plan, and the strategy fallback. Both are in the Cowork protocol.
+
+## Chores go to subagents (feat/done-agent-chores, 2026-10-10)
+
+User decision: what-now moves every card that does not need the user forward on its own, so the user only rules, merges and runs QA. This brings back the starwards intent ("promote anything that doesnt need to be blocked on me") that the 0.5 cut deferred.
+- Mechanism: what-now step 6b launches background subagents automatically, with no question. It does not use labels: since 2026-08-07, agents must never apply `agent-ready`.
+- Chores: DO cards with Owner `agent` (`counts.ready_agent`, not in `ready_do`), and the chore part of the routed card (for DECIDE, the probes and packet inputs).
+- Limits: `agents.max` (default 2), `agents.worktree`. `agents.dispatch` swaps subagents for an outside dispatcher instruction (e.g. a gh issue with a label agents may apply); the card goes to `filed #N` and its PR returns through sync. Subagents never merge, never label, and never edit `never:`.
+- Tracking: watch list `agent: <card> started <date>`; a stalled agent (>2 days, no PR or artifact) is relaunched.
+- Unverified: background agents outliving the what-now turn, and the Cowork behavior (expected: `Launched: unavailable`).
